@@ -1,0 +1,298 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:v="using:GerGit.Views"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.LocalChangesView"
+             x:DataType="vm:LocalChangesViewModel"
+             Background="{DynamicResource Color.Surface.Base}">
+  <UserControl.Styles>
+    <!-- List headers: 34 px, panel background, title 14 px medium. -->
+    <Style Selector="Border.lc-header">
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Background" Value="{DynamicResource Color.Surface.Panel}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Default}" />
+    </Style>
+    <Style Selector="TextBlock.lc-title">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Margin" Value="6,2,6,3" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.lc-header">
+      <Setter Property="Margin" Value="4" />
+      <Setter Property="Focusable" Value="False" />
+      <Setter Property="IsTabStop" Value="False" />
+    </Style>
+    <Style Selector="Button.lc-tool">
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Height" Value="17" />
+    </Style>
+
+    <!-- File lists: 20 px rows, 2 px horizontal margin; inactive selection colours while the list has no focus. -->
+    <Style Selector="ListBox.changes">
+      <Setter Property="Background" Value="{DynamicResource Color.List.Bg}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox.changes > ListBoxItem">
+      <Setter Property="MinHeight" Value="20" />
+      <Setter Property="Height" Value="20" />
+      <Setter Property="Margin" Value="2,0" />
+      <Setter Property="Padding" Value="2,0" />
+      <Setter Property="CornerRadius" Value="3" />
+    </Style>
+    <Style Selector="ListBox.changes > ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Color.Row.BgSelectedInactive}" />
+    </Style>
+    <Style Selector="ListBox.changes:focus-within > ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Color.Row.BgSelected}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.expander">
+      <Setter Property="Width" Value="16" />
+      <Setter Property="Height" Value="16" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Focusable" Value="False" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Glyph.Default}" />
+    </Style>
+
+    <!-- Commit box -->
+    <Style Selector="TextBox.subject">
+      <Setter Property="Height" Value="24" />
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Padding" Value="4,1,52,1" />
+      <Setter Property="BorderThickness" Value="1,1,1,0" />
+      <Setter Property="CornerRadius" Value="3,3,0,0" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox.description">
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Mono}" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Padding" Value="4,4,4,2" />
+      <Setter Property="BorderThickness" Value="1,0,1,1" />
+      <Setter Property="CornerRadius" Value="0,0,3,3" />
+      <Setter Property="AcceptsReturn" Value="True" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="MaxHeight" Value="235" />
+    </Style>
+    <Style Selector="TextBlock.counter">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Margin" Value="1,3,25,1" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Subjectlen.Ok}" />
+    </Style>
+    <Style Selector="TextBlock.counter.warn">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Subjectlen.Warn}" />
+    </Style>
+    <Style Selector="TextBlock.counter.error">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Subjectlen.Error}" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.DataTemplates>
+    <!-- List row: [chevron] change icon, file icon, text. -->
+    <DataTemplate DataType="vm:FileRow">
+      <Grid ColumnDefinitions="Auto,Auto,18,*" Margin="{Binding Indent}" Background="Transparent" ToolTip.Tip="{Binding ToolTip}">
+        <Panel Width="16" IsVisible="{Binding IsTree}">
+          <Button Classes="expander" IsVisible="{Binding IsFolder}" Click="OnChevronClick">
+            <c:LucideIcon Icon="{Binding ChevronIcon}" Size="12" />
+          </Button>
+        </Panel>
+        <c:StatusIcon Grid.Column="1" Kind="{Binding Kind}" Margin="2,0" VerticalAlignment="Center" IsVisible="{Binding !IsFolder}" />
+        <c:LucideIcon Grid.Column="2" Icon="{Binding FileIcon}" Size="14" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Foreground="{DynamicResource Color.Icon.Default}" />
+        <TextBlock Grid.Column="3" Text="{Binding Text}" Margin="2,0,0,0" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                   c:TrimmedToolTip.IsEnabled="{Binding ToolTip, Converter={x:Static ObjectConverters.IsNull}}" />
+      </Grid>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="250" MinWidth="220" MaxWidth="850" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" MinWidth="200" />
+    </Grid.ColumnDefinitions>
+
+    <!-- Left column: toolbar, Unstaged, splitter, Staged. Not built yet: filter row (Ctrl+F) and side-by-side button. -->
+    <Grid Background="{DynamicResource Color.List.Bg}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" MinHeight="110" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" MinHeight="110" />
+      </Grid.RowDefinitions>
+
+      <Border MinHeight="17" Background="{DynamicResource Color.Surface.HeaderStrip}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,2,0">
+          <Button Name="StageAllButton" Classes="icon lc-tool" ToolTip.Tip="{Binding StageAllToolTip}"
+                  IsEnabled="{Binding StageAllEnabled}" Command="{Binding StageOrUnstageAllCommand}">
+            <c:LucideIcon Icon="{Binding StageAllIcon}" Size="14" />
+          </Button>
+          <Button Name="ViewModeButton" Classes="icon lc-tool" ToolTip.Tip="View Mode">
+            <c:LucideIcon Icon="list" Size="14" />
+            <Button.Flyout>
+              <MenuFlyout Placement="BottomEdgeAlignedRight">
+                <MenuItem Header="View as Tree" Command="{Binding SetTreeModeCommand}">
+                  <MenuItem.Icon><c:LucideIcon Icon="check" Size="14" IsVisible="{Binding IsTreeMode}" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="View as List" Command="{Binding SetListModeCommand}">
+                  <MenuItem.Icon><c:LucideIcon Icon="check" Size="14" IsVisible="{Binding !IsTreeMode}" /></MenuItem.Icon>
+                </MenuItem>
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+        </StackPanel>
+      </Border>
+
+      <DockPanel Grid.Row="1">
+        <Border DockPanel.Dock="Top" Classes="lc-header" BorderThickness="0,1,0,1">
+          <DockPanel>
+            <Button Name="StageHeaderButton" DockPanel.Dock="Right" Classes="lc-header" Content="{Binding StageHeaderText}"
+                    IsEnabled="{Binding StageHeaderEnabled}" Command="{Binding StageHeaderCommand}" />
+            <TextBlock Classes="lc-title" Text="Unstaged" />
+          </DockPanel>
+        </Border>
+        <ListBox Name="UnstagedList" Classes="changes" TabIndex="1" SelectionMode="Multiple"
+                 ItemsSource="{Binding UnstagedRows}" Selection="{Binding UnstagedSelection}" IsEnabled="{Binding ListsEnabled}">
+          <ListBox.ContextMenu>
+            <ContextMenu Opening="OnMenuOpening">
+              <!-- External merge / diff item (filled when the menu opens), then Blame and History (Open and the file
+                   manager items are not built). -->
+              <MenuItem Name="UnstagedToolItem" IsVisible="False" Click="OnToolItem" />
+              <Separator IsVisible="{Binding #UnstagedToolItem.IsVisible}" />
+              <MenuItem Name="UnstagedBlameItem" Header="Blame/Timeline..." Click="OnBlame" />
+              <MenuItem Name="UnstagedHistoryItem" Header="History..." Click="OnHistory" />
+              <Separator />
+              <!-- Local Changes, unmerged file (the merge-tool item is UnstagedToolItem). -->
+              <MenuItem Name="ResolveOursItem" Header="{Binding ResolveOursText}" Command="{Binding ResolveOursCommand}"
+                        IsVisible="{Binding UnmergedSelected, FallbackValue=False}" />
+              <MenuItem Name="ResolveTheirsItem" Header="{Binding ResolveTheirsText}" Command="{Binding ResolveTheirsCommand}"
+                        IsVisible="{Binding UnmergedSelected, FallbackValue=False}" />
+              <Separator IsVisible="{Binding UnmergedSelected, FallbackValue=False}" />
+              <MenuItem Header="Stage" InputGesture="Enter" Command="{Binding StageCommand}" />
+              <MenuItem Header="Discard changes..." InputGesture="Delete" Command="{Binding DiscardCommand}" />
+              <Separator IsVisible="{Binding IsSingleSelection}" />
+              <MenuItem Header="Stage All" InputGesture="Ctrl+Shift+Alt+S" Command="{Binding StageAllCommand}"
+                        IsVisible="{Binding IsSingleSelection}" />
+              <!-- Not built yet: Open, file manager, ignore, LFS, patch and custom commands come later. -->
+              <Separator IsVisible="{Binding #UnstagedStashItem.IsVisible}" />
+              <MenuItem Name="UnstagedStashItem" IsVisible="False" Click="OnStashFiles" />
+              <Separator />
+              <MenuItem Header="Copy Path" InputGesture="Ctrl+C" Click="OnCopyPath" />
+              <MenuItem Header="Copy Full Path" InputGesture="Ctrl+Shift+C" Click="OnCopyFullPath" />
+            </ContextMenu>
+          </ListBox.ContextMenu>
+        </ListBox>
+      </DockPanel>
+
+      <GridSplitter Grid.Row="2" Classes="h" />
+
+      <DockPanel Grid.Row="3">
+        <Border DockPanel.Dock="Top" Classes="lc-header" BorderThickness="0,0,0,1">
+          <DockPanel>
+            <Button Name="UnstageHeaderButton" DockPanel.Dock="Right" Classes="lc-header" Content="{Binding UnstageHeaderText}"
+                    IsEnabled="{Binding UnstageHeaderEnabled}" Command="{Binding UnstageHeaderCommand}" />
+            <TextBlock Classes="lc-title" Text="Staged" />
+          </DockPanel>
+        </Border>
+        <ListBox Name="StagedList" Classes="changes" TabIndex="1" SelectionMode="Multiple"
+                 ItemsSource="{Binding StagedRows}" Selection="{Binding StagedSelection}" IsEnabled="{Binding ListsEnabled}">
+          <ListBox.ContextMenu>
+            <ContextMenu Opening="OnMenuOpening">
+              <MenuItem Name="StagedToolItem" IsVisible="False" Click="OnToolItem" />
+              <Separator IsVisible="{Binding #StagedToolItem.IsVisible}" />
+              <MenuItem Name="StagedBlameItem" Header="Blame/Timeline..." Click="OnBlame" />
+              <MenuItem Name="StagedHistoryItem" Header="History..." Click="OnHistory" />
+              <Separator />
+              <MenuItem Header="Unstage" InputGesture="Enter" Command="{Binding UnstageCommand}" />
+              <MenuItem Name="ResetToUnmergedItem" Header="Reset File to Unmerged State..." Command="{Binding ResetToUnmergedCommand}"
+                        IsVisible="{Binding ResetToUnmergedVisible, FallbackValue=False}" IsEnabled="{Binding ResetToUnmergedEnabled}" />
+              <Separator IsVisible="{Binding IsSingleSelection}" />
+              <MenuItem Header="Unstage All" InputGesture="Ctrl+Shift+Alt+S" Command="{Binding UnstageAllCommand}"
+                        IsVisible="{Binding IsSingleSelection}" />
+              <Separator IsVisible="{Binding #StagedStashItem.IsVisible}" />
+              <MenuItem Name="StagedStashItem" IsVisible="False" Click="OnStashFiles" />
+              <Separator />
+              <MenuItem Header="Copy Path" InputGesture="Ctrl+C" Click="OnCopyPath" />
+              <MenuItem Header="Copy Full Path" InputGesture="Ctrl+Shift+C" Click="OnCopyFullPath" />
+            </ContextMenu>
+          </ListBox.ContextMenu>
+        </ListBox>
+      </DockPanel>
+    </Grid>
+
+    <GridSplitter Grid.Column="1" Classes="v" />
+
+    <!-- Right column: diff, 1 px line, commit box. -->
+    <Grid Grid.Column="2" RowDefinitions="*,Auto,Auto">
+      <!-- An unmerged file shows the conflict card instead of the diff; resolved: the strip
+           above the diff. -->
+      <Grid RowDefinitions="Auto,*">
+        <Border Name="ResolvedStrip" Height="50" IsVisible="{Binding CardResolved}" BorderThickness="0,0,0,1"
+                BorderBrush="{DynamicResource Color.Border.Default}" Background="{DynamicResource Color.Surface.Base}">
+          <DockPanel>
+            <Button Name="CardStageButton" DockPanel.Dock="Right" Content="Stage" Margin="0,0,15,0" VerticalAlignment="Center"
+                    Command="{Binding StageCommand}" />
+            <c:LucideIcon Icon="circle-check" Size="32" Margin="10,0" VerticalAlignment="Center"
+                          Foreground="{DynamicResource Color.Status.Success}" />
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="File conflicts are resolved." FontSize="18" FontWeight="Medium" />
+              <TextBlock Text="You can stage the file now." FontSize="15" Foreground="{DynamicResource Color.Text.Secondary}" />
+            </StackPanel>
+          </DockPanel>
+        </Border>
+        <Panel Grid.Row="1" IsVisible="{Binding DiffVisible}">
+          <v:DiffView Name="DiffPane" DataContext="{Binding Diff}" />
+        </Panel>
+        <Panel Grid.RowSpan="2" IsVisible="{Binding CardUnresolved}">
+          <v:ConflictCard Name="ConflictCardPane" DataContext="{Binding Card}" />
+        </Panel>
+      </Grid>
+      <Border Grid.Row="1" Height="1" Background="{DynamicResource Color.Border.Default}" />
+      <!-- Not built yet: recent-messages menu, commit template, spell check, auto-complete, paste splitting, page guide,
+           Wrap Paragraph and sign-off come later. -->
+      <Grid Grid.Row="2" Margin="15" RowDefinitions="Auto,Auto,Auto,Auto" IsEnabled="{Binding !Busy}">
+        <Panel IsEnabled="{Binding MessageEnabled}">
+          <TextBox Name="SubjectBox" Classes="subject" TabIndex="2" PlaceholderText="Commit subject" Text="{Binding Subject}" />
+          <TextBlock Name="Counter" Classes="counter" Classes.warn="{Binding CounterWarn}" Classes.error="{Binding CounterError}"
+                     Text="{Binding CounterText}" IsVisible="{Binding CounterVisible}" ToolTip.Tip="{Binding CounterToolTip}" />
+        </Panel>
+        <Border Grid.Row="1" Height="1" Background="{DynamicResource Color.Border.Default}" />
+        <TextBox Name="DescriptionBox" Grid.Row="2" Classes="description" TabIndex="3" PlaceholderText="Description"
+                 Text="{Binding Description}" IsEnabled="{Binding MessageEnabled}" MaxHeight="{Binding DescriptionMaxHeight}" />
+        <DockPanel Grid.Row="3" Margin="0,8,0,0">
+          <CheckBox Name="AmendBox" DockPanel.Dock="Left" Content="Amend" Margin="0,6,0,4"
+                    IsChecked="{Binding Amend}" IsEnabled="{Binding CanAmend}" />
+          <!-- Commit Options menu: a separate arrow button next to the commit button, not one split
+               button. -->
+          <Button Name="CommitMenuButton" DockPanel.Dock="Right" Padding="4,2" Margin="1,0,0,0" ToolTip.Tip="Commit Settings"
+                  IsVisible="{Binding HasCommitMenu}" IsEnabled="{Binding CanCommit}">
+            <c:LucideIcon Icon="chevron-down" Size="14" />
+            <Button.Flyout>
+              <MenuFlyout Placement="TopEdgeAlignedRight">
+                <MenuItem Header="Commit Options" IsEnabled="False" />
+                <Separator />
+                <MenuItem Name="CommitMenuItem" Header="{Binding CommitMenuText}" InputGesture="Ctrl+Shift+Enter"
+                          Command="{Binding CommitCommand}" CommandParameter="{Binding InvertedPush}" />
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+          <Button Name="CommitButton" DockPanel.Dock="Right" Padding="10,2,10,2" Content="{Binding CommitText}"
+                  IsEnabled="{Binding CanCommit}" Command="{Binding CommitCommand}" />
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" IsVisible="{Binding HasWarning}">
+            <TextBlock Name="WarningText" Text="{Binding Warning}" Margin="4,2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            <c:LucideIcon Icon="triangle-alert" Size="16" VerticalAlignment="Center" Foreground="{DynamicResource Color.Status.Warning}" />
+          </StackPanel>
+        </DockPanel>
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>

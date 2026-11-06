@@ -1,0 +1,117 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.CloneView"
+             x:DataType="vm:CloneViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+    <StyleInclude Source="avares://GerGit/Views/Accounts/AccountStyles.axaml" />
+    <Style Selector="ComboBox#AccountBox ComboBoxItem" x:DataType="vm:CloneAccountItem">
+      <Setter Property="IsEnabled" Value="{Binding IsSelectable}" />
+    </Style>
+    <Style Selector="Button.repo">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+    </Style>
+    <Style Selector="Button.repo:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Color.Surface.Hover}" />
+    </Style>
+  </UserControl.Styles>
+  <StackPanel>
+    <!-- Clone rows. The Test Connection result shows in the footer status (DialogViewModel), not in a form row. -->
+    <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+      <TextBlock Classes="label" Text="Repository Url:" />
+      <TextBox Name="UrlBox" Grid.Column="1" Text="{Binding Url}" PlaceholderText="Git Repository Url">
+        <TextBox.InnerLeftContent>
+          <c:LucideIcon Icon="link" Size="14" Margin="6,0,0,0" VerticalAlignment="Center" />
+        </TextBox.InnerLeftContent>
+        <TextBox.InnerRightContent>
+          <Button Name="ProtocolButton" Classes="icon" Margin="0,0,4,0" Padding="4,0" VerticalAlignment="Center"
+                  IsVisible="{Binding HasProtocol}" Click="OnProtocolClick">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+              <TextBlock Text="{Binding ProtocolText}" FontSize="12" VerticalAlignment="Center"
+                         Foreground="{DynamicResource Color.Accent.Base}" />
+              <c:LucideIcon Icon="chevron-down" Size="10" VerticalAlignment="Center" Foreground="{DynamicResource Color.Accent.Base}" />
+            </StackPanel>
+          </Button>
+        </TextBox.InnerRightContent>
+      </TextBox>
+      <Button Name="TestButton" Grid.Row="1" Grid.Column="1" Classes="link" HorizontalAlignment="Right" Content="Test Connection"
+              IsVisible="{Binding ShowTestConnection}" Command="{Binding TestConnectionCommand}" />
+      <TextBlock Classes="label" Grid.Row="2" Text="Parent Folder:" />
+      <DockPanel Grid.Row="2" Grid.Column="1">
+        <Button Name="BrowseButton" DockPanel.Dock="Right" Margin="4,0,0,0" Content="Browse..." Click="OnBrowse" />
+        <TextBox Name="ParentBox" Text="{Binding ParentFolder}" PlaceholderText="Parent folder path" />
+      </DockPanel>
+      <TextBlock Classes="label" Grid.Row="3" Text="Name:" />
+      <TextBox Name="NameBox" Grid.Row="3" Grid.Column="1" Text="{Binding Name}" PlaceholderText="Repository name" />
+      <CheckBox Name="RecurseSubmodules" Grid.Row="4" Grid.Column="1" Content="Recurse submodules"
+                IsChecked="{Binding RecurseSubmodules}"
+                ToolTip.Tip="Also clone the submodules, from the URLs listed in the repository" />
+      <Separator Grid.Row="5" Grid.ColumnSpan="2" IsVisible="{Binding HasAccountSelector}" />
+      <TextBlock Classes="label" Grid.Row="6" Text="Account:" IsVisible="{Binding HasAccountSelector}" />
+      <ComboBox Name="AccountBox" Grid.Row="6" Grid.Column="1" ItemsSource="{Binding AccountItems}"
+                SelectedItem="{Binding SelectedAccount}" IsVisible="{Binding HasAccountSelector}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:CloneAccountItem">
+            <Panel>
+              <Separator IsVisible="{Binding IsSeparator}" Margin="0" />
+              <StackPanel Orientation="Horizontal" Spacing="4" IsVisible="{Binding IsSelectable}">
+                <c:HostIcon Type="{Binding Type}" Size="14" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Text}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Panel>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </Grid>
+
+    <!-- The projects of all accounts, below the form so the URL box keeps
+         the first focus. A click on a repository fills the URL and picks its account. -->
+    <DockPanel Name="Projects" Height="220" Margin="0,10,0,0" IsVisible="{Binding HasAccounts}">
+      <TextBox Name="FilterBox" DockPanel.Dock="Top" Classes="filter" Margin="0,0,0,4" Text="{Binding Filter}" PlaceholderText="Filter" />
+      <!-- No selection: only repository rows react, every click (also on the same row again) fills the URL. -->
+      <Border BorderThickness="1" BorderBrush="{DynamicResource Color.List.Border}" Background="{DynamicResource Color.List.Bg}">
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+      <ItemsControl Name="ProjectList" ItemsSource="{Binding Rows}" Margin="4,0">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.DataTemplates>
+          <DataTemplate DataType="vm:CloneAccountHeader">
+            <StackPanel Orientation="Horizontal" Spacing="4" Height="22">
+              <c:HostIcon Type="{Binding Type}" Size="14" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding Text}" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </StackPanel>
+          </DataTemplate>
+          <DataTemplate DataType="vm:CloneOwnerHeader">
+            <TextBlock Text="{Binding Owner}" FontSize="13.5" FontWeight="Medium" Margin="12,0,0,0" Height="20" VerticalAlignment="Center" />
+          </DataTemplate>
+          <DataTemplate DataType="vm:CloneListStatus">
+            <StackPanel Margin="0,6" Spacing="2">
+              <TextBlock Text="{Binding Title}" FontSize="13" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+              <TextBlock Text="{Binding Message}" FontSize="12" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+                         Foreground="{DynamicResource Color.Text.Muted}" IsVisible="{Binding HasMessage}" />
+            </StackPanel>
+          </DataTemplate>
+          <DataTemplate DataType="vm:CloneRepoRow">
+            <Button Classes="repo" Name="RepoButton" Height="20" ToolTip.Tip="{Binding Repository.CloneUrl}" Click="OnRepoClick">
+              <StackPanel Orientation="Horizontal" Margin="22,0,0,0">
+                <c:HostIcon Type="{Binding Type}" Size="14" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Name}" FontSize="13" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.DataTemplates>
+      </ItemsControl>
+      </ScrollViewer>
+      </Border>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

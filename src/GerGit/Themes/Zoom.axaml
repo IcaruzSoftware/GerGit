@@ -1,0 +1,39 @@
+<!--
+  Layout zoom for every window and popup; the sizes are scaled in Views/Zoom.cs.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- The Fluent window template (Avalonia 12.1) with the content in a LayoutTransformControl. Only the content is
+       scaled, not the overlay and adorner layers: popups and focus adorners already follow their target's scale.
+       Limitation: a copy of the Fluent template; compare it with the new one on an Avalonia update. -->
+  <Style Selector=":is(Window)">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+          <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+          <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" />
+          <VisualLayerManager Name="PART_VisualLayerManager">
+            <LayoutTransformControl Name="PART_Zoom" LayoutTransform="{DynamicResource Zoom.Transform}">
+              <ContentPresenter Name="PART_ContentPresenter"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Content="{TemplateBinding Content}"
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </LayoutTransformControl>
+          </VisualLayerManager>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <!-- Context menus, tooltips, flyouts, combo box drop-downs, submenus and GerGit's own popups take the scale of
+       their target, so they match the window they open from (and follow a zoom change while open). :is also covers
+       Popup subclasses (AvaloniaEdit's completion popups).
+       Limitation: popup offsets (HorizontalOffset / VerticalOffset) are not scaled. -->
+  <Style Selector=":is(Popup)">
+    <Setter Property="InheritsTransform" Value="True" />
+  </Style>
+</Styles>

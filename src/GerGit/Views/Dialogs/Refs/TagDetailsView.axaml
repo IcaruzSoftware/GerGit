@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.TagDetailsView"
+             x:DataType="vm:TagDetailsViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <!-- Tag Details window: tagger avatar 42x42 top left, name / e-mail / date right of it. -->
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,*">
+    <DockPanel Grid.ColumnSpan="2" Margin="0,0,0,6">
+      <c:AvatarView Name="Avatar" Width="42" Height="42" Margin="0,0,10,0" AuthorName="{Binding TaggerName}" Email="{Binding TaggerEmail}" />
+      <StackPanel VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <SelectableTextBlock Name="Tagger" FontSize="14" FontWeight="Medium" Text="{Binding TaggerName}" />
+          <SelectableTextBlock Name="Email" Classes="description" VerticalAlignment="Bottom" Text="{Binding TaggerEmail}" />
+        </StackPanel>
+        <SelectableTextBlock Name="Date" Classes="description" Text="{Binding Date}" />
+      </StackPanel>
+    </DockPanel>
+    <TextBlock Grid.Row="1" Classes="label" Text="Tag:" />
+    <c:RefView Name="TagRow" Grid.Row="1" Grid.Column="1" Icon="tag" Text="{Binding TagName}" />
+    <TextBlock Grid.Row="2" Classes="label" Text="Message:" VerticalAlignment="Top" />
+    <Border Grid.Row="2" Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}"
+            Background="{DynamicResource Color.Input.Bg}">
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <SelectableTextBlock Name="Message" Margin="4" FontSize="13" Text="{Binding Message}" />
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</UserControl>

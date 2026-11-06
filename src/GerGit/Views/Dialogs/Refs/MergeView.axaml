@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.MergeView"
+             x:DataType="vm:MergeViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Merge:" />
+    <c:RefView Name="Source" Grid.Column="1" Icon="{Binding Source.Icon}" Text="{Binding Source.Text}" Detail="{Binding Source.Detail}" />
+    <TextBlock Grid.Row="1" Classes="label" Text="Into:" />
+    <c:RefView Name="Destination" Grid.Row="1" Grid.Column="1" Icon="{Binding Destination.Icon}" Text="{Binding Destination.Text}" />
+    <TextBlock Grid.Row="2" Classes="label" Text="Merge Option:" />
+    <ComboBox Name="OptionBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" SelectedIndex="{Binding SelectedIndex}">
+      <ComboBox.Styles>
+        <!-- The closed box shows a snapshot of the 385 px row in about 300 px: left-aligned, so the title and description
+             stay whole and only the option column is cut (centred, it cut "No Fast-Forward" to ":-Forward"). -->
+        <Style Selector="ComboBox /template/ Rectangle">
+          <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+      </ComboBox.Styles>
+      <ComboBoxItem>
+        <Grid ColumnDefinitions="110,200,75">
+          <TextBlock Text="Default" />
+          <TextBlock Grid.Column="1" Classes="description" Text="Fast-forward if possible" />
+        </Grid>
+      </ComboBoxItem>
+      <ComboBoxItem>
+        <Grid ColumnDefinitions="110,200,75">
+          <TextBlock Text="No Fast-Forward" />
+          <TextBlock Grid.Column="1" Classes="description" Text="Always create a merge commit" />
+          <TextBlock Grid.Column="2" Classes="description" HorizontalAlignment="Right" Text="--no-ff" />
+        </Grid>
+      </ComboBoxItem>
+      <ComboBoxItem IsEnabled="False"><Separator /></ComboBoxItem>
+      <ComboBoxItem>
+        <Grid ColumnDefinitions="110,200,75">
+          <TextBlock Text="Squash" />
+          <TextBlock Grid.Column="1" Classes="description" Text="Squash merge" />
+          <TextBlock Grid.Column="2" Classes="description" HorizontalAlignment="Right" Text="--squash" />
+        </Grid>
+      </ComboBoxItem>
+      <ComboBoxItem>
+        <Grid ColumnDefinitions="110,200,75">
+          <TextBlock Text="Don't Commit" />
+          <TextBlock Grid.Column="1" Classes="description" Text="Merge without commit" />
+          <TextBlock Grid.Column="2" Classes="description" HorizontalAlignment="Right" Text="--no-commit" />
+        </Grid>
+      </ComboBoxItem>
+    </ComboBox>
+  </Grid>
+</UserControl>

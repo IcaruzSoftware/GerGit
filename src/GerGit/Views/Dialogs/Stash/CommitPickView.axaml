@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.CommitPickView"
+             x:DataType="vm:CommitPickViewModel">
+  <!-- Cherry-pick and "Revert". -->
+  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+    <TextBlock FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,8,0" Text="{Binding CommitsLabel}" />
+    <c:RefView Grid.Column="1" Icon="git-commit-horizontal" Text="{Binding Commits[0].ShortSha}" Detail="{Binding Commits[0].Subject}"
+               IsVisible="{Binding IsSingle}" />
+    <Border Grid.Column="1" Height="80" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}"
+            Background="{DynamicResource Color.List.Bg}" IsVisible="{Binding IsMultiple}">
+      <ScrollViewer>
+        <ItemsControl Name="CommitList" ItemsSource="{Binding Commits}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:CommitItem">
+              <c:RefView Margin="6,2" Icon="git-commit-horizontal" Text="{Binding ShortSha}" Detail="{Binding Subject}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+    <TextBlock Grid.Row="1" FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,8,8,0" Text="Parent to skip:" IsVisible="{Binding HasParents}" />
+    <ComboBox Name="ParentBox" Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" HorizontalAlignment="Stretch" IsVisible="{Binding HasParents}"
+              ItemsSource="{Binding Parents}" SelectedItem="{Binding SelectedParent}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:CommitItem">
+          <c:RefView Icon="git-commit-horizontal" Text="{Binding ShortSha}" Detail="{Binding Subject}" />
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <CheckBox Name="CommitBox" Grid.Row="2" Grid.Column="1" Margin="0,8,0,0" Content="Commit the changes"
+              ToolTip.Tip="--no-commit (when unchecked)" IsChecked="{Binding CommitChanges}" />
+    <CheckBox Name="OriginBox" Grid.Row="3" Grid.Column="1" Content="Append origin to commit message" ToolTip.Tip="-x"
+              IsChecked="{Binding AppendOrigin}" IsEnabled="{Binding CommitChanges}" IsVisible="{Binding ShowAppendOrigin}" />
+  </Grid>
+</UserControl>

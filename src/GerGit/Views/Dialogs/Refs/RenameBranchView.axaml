@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.RenameBranchView"
+             x:DataType="vm:RenameBranchViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+    <TextBlock Classes="label" Text="New Name:" />
+    <c:RefNameBox Name="NameBox" Grid.Column="1" Icon="git-branch" Text="{Binding NewName}" PlaceholderText="Enter new branch name" />
+    <CheckBox Name="RenameRemoteBox" Grid.Row="1" Grid.Column="1" Content="{Binding RenameRemoteText}" IsChecked="{Binding RenameRemote}"
+              IsVisible="{Binding ShowRenameRemote}" />
+  </Grid>
+</UserControl>

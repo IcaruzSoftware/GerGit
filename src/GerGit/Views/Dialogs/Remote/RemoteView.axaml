@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.RemoteView"
+             x:DataType="vm:RemoteViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+  </UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+    <TextBlock Classes="label" Text="Remote:" />
+    <!-- Limitation: always the generic remote icon; Edit mode should show the edited remote's host icon (RefNameBox has
+         only Lucide icons). -->
+    <c:RefNameBox Name="RemoteName" Grid.Column="1" Icon="server" Height="24" Text="{Binding Name}" PlaceholderText="Remote name" />
+    <TextBlock Classes="label" Grid.Row="1" Text="Repository Url:" />
+    <TextBox Name="Url" Grid.Row="1" Grid.Column="1" Text="{Binding Url}" PlaceholderText="Git Repository Url">
+      <TextBox.InnerLeftContent>
+        <c:LucideIcon Icon="link" Size="14" Margin="6,0,0,0" VerticalAlignment="Center" />
+      </TextBox.InnerLeftContent>
+    </TextBox>
+  </Grid>
+</UserControl>

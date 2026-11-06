@@ -1,0 +1,210 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GerGit.ViewModels"
+        xmlns:c="using:GerGit.Controls"
+        xmlns:ae="using:AvaloniaEdit"
+        x:Class="GerGit.Views.MergeResolverWindow"
+        x:DataType="vm:MergeResolverViewModel"
+        Title="Merge" MinWidth="980" CanResize="True" ShowInTaskbar="False"
+        Background="{DynamicResource Color.Dialog.Bg}">
+  <Window.Styles>
+    <!-- Large conflict check box: radius 5, 1 px border, padding 8,2,8,4; inner 16 x 16 box margin 4,2,12,0. -->
+    <Style Selector="Button.mergecheck">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="outer" CornerRadius="5" BorderThickness="1" Padding="8,2,8,4"
+                  BorderBrush="{DynamicResource Color.Mergecheck.Border}" Background="{DynamicResource Color.Mergecheck.Bg}">
+            <DockPanel>
+              <Border Name="inner" DockPanel.Dock="Left" Width="16" Height="16" Margin="4,2,12,0" VerticalAlignment="Top"
+                      CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Color.Check.Border}">
+                <c:LucideIcon Name="glyph" Icon="check" Size="12" IsVisible="False" HorizontalAlignment="Center"
+                              VerticalAlignment="Center" Foreground="{DynamicResource Color.Text.OnAccent}" />
+              </Border>
+              <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </DockPanel>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.mergecheck.checked /template/ Border#outer">
+      <Setter Property="Background" Value="{DynamicResource Color.Mergecheck.BgPressed}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Accent.Base}" />
+    </Style>
+    <Style Selector="Button.mergecheck.checked /template/ Border#inner">
+      <Setter Property="Background" Value="{DynamicResource Color.Accent.Base}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Accent.Base}" />
+    </Style>
+    <Style Selector="Button.mergecheck.checked /template/ c|LucideIcon#glyph">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="Button.mergecheck:disabled /template/ Border#outer">
+      <Setter Property="Background" Value="{DynamicResource Color.Mergecheck.BgDisabled}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Mergecheck.BorderDisabled}" />
+    </Style>
+    <Style Selector="Border.chip">
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Ref.DetailBorder}" />
+      <Setter Property="Background" Value="{DynamicResource Color.Ref.DetailBg}" />
+    </Style>
+    <Style Selector="Border.chip > TextBlock">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.RefLabel}" />
+    </Style>
+    <!-- Counter pill: red while unresolved conflicts are left, green when complete. -->
+    <Style Selector="Border.pill">
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="Background" Value="#FF6663" />
+    </Style>
+    <Style Selector="Border.pill.complete">
+      <Setter Property="Background" Value="#34C84A" />
+    </Style>
+    <Style Selector="Button.nav, ToggleButton.nav">
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="4,0" />
+    </Style>
+    <Style Selector="Button.chunk">
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Margin" Value="2" />
+      <Setter Property="Padding" Value="8,0" />
+      <Setter Property="Focusable" Value="False" />
+    </Style>
+    <Style Selector="ae|TextEditor">
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Mono}" />
+      <!-- The code-editor font size the diff view uses (Preferences > General > Font size). -->
+      <Setter Property="FontSize" Value="{Binding EditorFontSize, Source={x:Static vm:AppPreferences.Current}}" />
+      <Setter Property="Background" Value="{DynamicResource Color.Editor.Bg}" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Editor.Fg}" />
+      <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+    </Style>
+  </Window.Styles>
+
+  <Grid Margin="20,12,20,20" RowDefinitions="Auto,Auto,*,Auto">
+    <!-- 1. Title line -->
+    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,-4,0,0">
+      <TextBlock Text="Merge" FontSize="16" FontWeight="Medium" VerticalAlignment="Center" />
+      <c:LucideIcon Icon="file" Size="14" VerticalAlignment="Center" />
+      <TextBlock Name="PathText" FontSize="14" VerticalAlignment="Center">
+        <Run Text="{Binding Dir}" Foreground="{DynamicResource Color.Text.Secondary}" /><Run Text="{Binding Name}" FontWeight="Medium" />
+      </TextBlock>
+    </StackPanel>
+
+    <!-- 2. Source headers: theirs | Resolved | pill + nav, ours -->
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="0,8,0,0">
+      <Button Name="TheirsBox" Classes="mergecheck" Classes.checked="{Binding TheirsChecked}" Width="320"
+              VerticalAlignment="Bottom" IsEnabled="{Binding IsLoaded}" Command="{Binding ToggleTheirsCommand}">
+        <StackPanel>
+          <Border Classes="chip" Height="18"><TextBlock Text="{Binding TheirsName}" VerticalAlignment="Center" /></Border>
+          <!-- Header of the incoming commit. -->
+          <DockPanel Height="18" IsVisible="{Binding TheirsCommit, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <c:AvatarView Name="TheirsAvatar" DockPanel.Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center"
+                          AuthorName="{Binding TheirsCommit.AuthorName}" Email="{Binding TheirsCommit.AuthorEmail}" />
+            <TextBlock DockPanel.Dock="Right" Margin="6,0,0,0" FontSize="13" VerticalAlignment="Center"
+                       Foreground="{DynamicResource Color.Text.Secondary}" Text="{Binding TheirsDate}" />
+            <TextBlock FontSize="13" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       Text="{Binding TheirsCommit.Subject}" ToolTip.Tip="{Binding TheirsCommit.Message}" />
+          </DockPanel>
+        </StackPanel>
+      </Button>
+      <TextBlock Grid.Column="1" Text="Resolved" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                 Margin="4,0,4,2" IsVisible="{Binding ShowResolvedLabel}" />
+      <DockPanel Grid.Column="2">
+        <StackPanel DockPanel.Dock="Right" Margin="8,0,0,0" IsVisible="{Binding ShowCounter}" VerticalAlignment="Top">
+          <Border Name="Pill" Classes="pill" Classes.complete="{Binding Complete}" ToolTip.Tip="{Binding CounterTip}">
+            <TextBlock Text="{Binding Counter}" FontSize="11" Foreground="White" />
+          </Border>
+          <StackPanel Orientation="Horizontal" Spacing="2" Margin="0,7,0,0">
+            <Button Name="PrevButton" Classes="nav" Click="OnPrevious" ToolTip.Tip="Previous conflict">
+              <c:LucideIcon Icon="chevron-up" Size="16" />
+            </Button>
+            <Button Name="NextButton" Classes="nav" Click="OnNext" ToolTip.Tip="Next conflict">
+              <c:LucideIcon Icon="chevron-down" Size="16" />
+            </Button>
+          </StackPanel>
+        </StackPanel>
+        <Button Name="OursBox" Classes="mergecheck" Classes.checked="{Binding OursChecked}" Width="360"
+                VerticalAlignment="Bottom" IsEnabled="{Binding IsLoaded}" Command="{Binding ToggleOursCommand}">
+          <StackPanel>
+            <Border Classes="chip" Height="18"><TextBlock Text="{Binding OursName}" VerticalAlignment="Center" /></Border>
+            <DockPanel Height="18" IsVisible="{Binding OursCommit, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <c:AvatarView Name="OursAvatar" DockPanel.Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center"
+                            AuthorName="{Binding OursCommit.AuthorName}" Email="{Binding OursCommit.AuthorEmail}" />
+              <TextBlock DockPanel.Dock="Right" Margin="6,0,0,0" FontSize="13" VerticalAlignment="Center"
+                         Foreground="{DynamicResource Color.Text.Secondary}" Text="{Binding OursDate}" />
+              <TextBlock FontSize="13" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                         Text="{Binding OursCommit.Subject}" ToolTip.Tip="{Binding OursCommit.Message}" />
+            </DockPanel>
+          </StackPanel>
+        </Button>
+      </DockPanel>
+    </Grid>
+
+    <!-- 3. Editors. The grid's rows/columns are set by ApplyOrientation. -->
+    <Border Grid.Row="2" Margin="0,4,0,0" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}">
+      <Panel>
+        <Grid Name="EditorGrid" IsVisible="{Binding IsText}" Background="{DynamicResource Color.Border.Default}">
+          <Panel Name="TheirsHost" ClipToBounds="True">
+            <ae:TextEditor Name="TheirsEditor" IsReadOnly="True" VerticalScrollBarVisibility="Hidden" />
+            <Border Name="TheirsButtons" IsVisible="False" HorizontalAlignment="Right" VerticalAlignment="Top"
+                    CornerRadius="3" Background="{DynamicResource Color.Diff.FloatingButtonsBg}">
+              <Button Name="TheirsChunkButton" Classes="chunk" Click="OnTheirsChunk" />
+            </Border>
+          </Panel>
+          <Panel Name="OursHost" ClipToBounds="True">
+            <ae:TextEditor Name="OursEditor" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
+            <!-- Not built yet: scrollbar map of resolved/unresolved blocks (no colours defined yet). -->
+            <Border Name="OursButtons" IsVisible="False" HorizontalAlignment="Right" VerticalAlignment="Top"
+                    CornerRadius="3" Background="{DynamicResource Color.Diff.FloatingButtonsBg}">
+              <Button Name="OursChunkButton" Classes="chunk" Click="OnOursChunk" />
+            </Border>
+          </Panel>
+          <GridSplitter Name="Splitter" Classes="h" />
+          <Border Name="ResultHost" BorderBrush="{DynamicResource Color.Border.Default}">
+            <Panel>
+              <ae:TextEditor Name="ResultEditor" />
+              <TextBlock Text="editing allowed" FontSize="12" IsHitTestVisible="False" HorizontalAlignment="Center"
+                         VerticalAlignment="Bottom" Margin="0,0,0,2" Foreground="{DynamicResource Color.Text.Secondary}" />
+            </Panel>
+          </Border>
+        </Grid>
+
+        <!-- Binary / LFS / submodule: both versions side by side, theirs left. -->
+        <Grid Name="BinaryView" ColumnDefinitions="*,1,*" IsVisible="{Binding IsBinary}">
+          <StackPanel Classes="fallback" VerticalAlignment="Center">
+            <c:LucideIcon Icon="file" Size="32" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+            <TextBlock Classes="empty-text" Text="{Binding BinaryText}" />
+            <TextBlock Classes="empty-text" Text="{Binding TheirsName}" />
+          </StackPanel>
+          <Border Grid.Column="1" Background="{DynamicResource Color.Border.Default}" />
+          <StackPanel Grid.Column="2" Classes="fallback" VerticalAlignment="Center">
+            <c:LucideIcon Icon="file" Size="32" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+            <TextBlock Classes="empty-text" Text="{Binding BinaryText}" />
+            <TextBlock Classes="empty-text" Text="{Binding OursName}" />
+          </StackPanel>
+        </Grid>
+      </Panel>
+    </Border>
+
+    <!-- 4. Bottom bar -->
+    <Grid Grid.Row="3" Margin="0,12,0,2" ColumnDefinitions="Auto,*,Auto">
+      <ToggleButton Name="OrientationToggle" Classes="nav" VerticalAlignment="Center" ToolTip.Tip="Switch orientation"
+                    IsChecked="{Binding Vertical}" IsVisible="{Binding IsText}">
+        <c:LucideIcon Icon="{Binding OrientationIcon}" Size="16" />
+      </ToggleButton>
+      <StackPanel Grid.Column="2" Orientation="Horizontal">
+        <Button Name="ResolveButton" Margin="4,0,4,0" Content="Resolve" IsDefault="False" IsEnabled="{Binding CanResolve}"
+                Click="OnResolve" />
+        <Button Name="CancelButton" Margin="4,0,0,0" Content="Cancel" Click="OnCancel" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

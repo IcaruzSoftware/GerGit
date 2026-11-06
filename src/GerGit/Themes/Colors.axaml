@@ -1,0 +1,835 @@
+<!--
+  GerGit colour tokens and fonts, dark and light (switching: Views/AppTheme.cs).
+
+  Naming: every design token becomes a SolidColorBrush keyed "Color." + the token, each
+  dot-separated part in PascalCase:  text.primary -> Color.Text.Primary,
+  tree-row.bg-selected-inactive -> Color.TreeRow.BgSelectedInactive. "@NN% alpha" is folded into ARGB.
+  repotab.shadow-opacity is folded into the selected repo tab's shadow (Color.Repotab.Shadow, a BoxShadows: black at 0.8 / 0.30).
+  Palettes: Color.Lane.<0-12>, Color.RefLabel.Border.<0-12>, Color.RefLabel.Fill.<0-12>,
+  Color.Repo.<Name>, Color.FileStatus.<Kind>, Color.Status.<Warning|Error|Success>, Color.Diff.<Part>,
+  Color.Merge.<Part>, Color.Syntax.<Class>. Fonts: Font.UI, Font.Mono.
+
+  Values that differ per theme live in the "Dark" and "Light" theme dictionaries below, with the same keys in both
+  (a test checks that). Always reference them with DynamicResource so a theme switch re-colours everything; code that
+  looks one up must look it up again when ActualThemeVariant changes.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Linux mapping. Limitation: the desktop UI font is not read; Inter (bundled) comes first. -->
+  <FontFamily x:Key="Font.UI">fonts:Inter#Inter, Noto Sans, sans-serif</FontFamily>
+  <FontFamily x:Key="Font.Mono">JetBrains Mono, DejaVu Sans Mono, Liberation Mono, monospace</FontFamily>
+
+  <!-- lane colours (both themes) -->
+  <SolidColorBrush x:Key="Color.Lane.0" Color="#FF9502" />
+  <SolidColorBrush x:Key="Color.Lane.1" Color="#FFCC00" />
+  <SolidColorBrush x:Key="Color.Lane.2" Color="#FF3B30" />
+  <SolidColorBrush x:Key="Color.Lane.3" Color="#A2845E" />
+  <SolidColorBrush x:Key="Color.Lane.4" Color="#64DA38" />
+  <SolidColorBrush x:Key="Color.Lane.5" Color="#1CADF8" />
+  <SolidColorBrush x:Key="Color.Lane.6" Color="#CB73E1" />
+  <SolidColorBrush x:Key="Color.Lane.7" Color="#8E8E91" />
+  <SolidColorBrush x:Key="Color.Lane.8" Color="#FF2968" />
+  <SolidColorBrush x:Key="Color.Lane.9" Color="#30D5C8" />
+  <SolidColorBrush x:Key="Color.Lane.10" Color="#5856D6" />
+  <SolidColorBrush x:Key="Color.Lane.11" Color="#B4D435" />
+  <SolidColorBrush x:Key="Color.Lane.12" Color="#FF6F61" />
+  <SolidColorBrush x:Key="Color.Graph.HoverOutline" Color="#0092FF" />
+
+  <!-- merge editor line-number gutter (both themes) -->
+  <SolidColorBrush x:Key="Color.Merge.LineNumber" Color="#C0C0C0" />
+  <SolidColorBrush x:Key="Color.Merge.SelectedTag" Color="#3B89DA" />
+
+  <!-- repository colours -->
+  <SolidColorBrush x:Key="Color.Repo.Red" Color="#FF3B30" />
+  <SolidColorBrush x:Key="Color.Repo.Orange" Color="#FF9502" />
+  <SolidColorBrush x:Key="Color.Repo.Yellow" Color="#FFCC00" />
+  <SolidColorBrush x:Key="Color.Repo.Green" Color="#64DA38" />
+  <SolidColorBrush x:Key="Color.Repo.Blue" Color="#1CADF8" />
+  <SolidColorBrush x:Key="Color.Repo.Violet" Color="#CB73E1" />
+
+  <!-- file status badges and status icons (both themes) -->
+  <SolidColorBrush x:Key="Color.FileStatus.Added" Color="#28CD41" />
+  <SolidColorBrush x:Key="Color.FileStatus.Modified" Color="#FFCC00" />
+  <SolidColorBrush x:Key="Color.FileStatus.Deleted" Color="#FF453A" />
+  <SolidColorBrush x:Key="Color.FileStatus.Renamed" Color="#BF5AF2" />
+  <SolidColorBrush x:Key="Color.FileStatus.Copied" Color="#AF52DE" />
+  <SolidColorBrush x:Key="Color.FileStatus.Conflict" Color="#FFCC20" />
+  <SolidColorBrush x:Key="Color.Status.Warning" Color="#FFCC20" />
+  <SolidColorBrush x:Key="Color.Status.Error" Color="#E51400" />
+  <SolidColorBrush x:Key="Color.Status.Success" Color="#36CF4A" />
+
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Dark">
+      <!-- tokens -->
+      <SolidColorBrush x:Key="Color.Text.Primary" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="Color.Text.Fg" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="Color.Text.Secondary" Color="#C4C0C0" />
+      <SolidColorBrush x:Key="Color.Text.Muted" Color="#CAC6C6" />
+      <SolidColorBrush x:Key="Color.Text.Dim" Color="#DADADA" />
+      <SolidColorBrush x:Key="Color.Text.OnAccent" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Text.Disabled" Color="#ABABAB" />
+      <SolidColorBrush x:Key="Color.Text.DialogDescription" Color="#CAC6C6" />
+      <SolidColorBrush x:Key="Color.Text.RefLabel" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Text.Window" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Text.Toolbar" Color="#B2B2B2" />
+      <SolidColorBrush x:Key="Color.Text.MainMenu" Color="#C0C6C6" />
+      <SolidColorBrush x:Key="Color.Text.Link" Color="#3E9FF8" />
+      <SolidColorBrush x:Key="Color.Icon.Default" Color="#CFCFCF" />
+      <SolidColorBrush x:Key="Color.Glyph.Default" Color="#777777" />
+      <SolidColorBrush x:Key="Color.Glyph.Disabled" Color="#C6C6C6" />
+      <SolidColorBrush x:Key="Color.Accent.Base" Color="#3E9FF8" />
+      <SolidColorBrush x:Key="Color.Accent.Secondary" Color="#007ACC" />
+      <SolidColorBrush x:Key="Color.Accent.WindowBorder" Color="#3BACED" />
+      <SolidColorBrush x:Key="Color.Surface.Base" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Surface.EmptyState" Color="#282828" />
+      <SolidColorBrush x:Key="Color.Surface.Panel" Color="#2B2B2B" />
+      <SolidColorBrush x:Key="Color.Surface.HeaderStrip" Color="#212121" />
+      <SolidColorBrush x:Key="Color.Surface.Tile" Color="#2D2D2D" />
+      <SolidColorBrush x:Key="Color.Surface.TileAlt" Color="#2D2D2D" />
+      <SolidColorBrush x:Key="Color.Border.Tile" Color="#1D1D1D" />
+      <SolidColorBrush x:Key="Color.Surface.Sunken" Color="#202020" />
+      <SolidColorBrush x:Key="Color.Surface.Hover" Color="#3C3C3C" />
+      <SolidColorBrush x:Key="Color.Surface.Pressed" Color="#3C3C3C" />
+      <SolidColorBrush x:Key="Color.Surface.Disabled" Color="#3C3C3C" />
+      <SolidColorBrush x:Key="Color.Surface.Group" Color="#3C3C3C" />
+      <SolidColorBrush x:Key="Color.Border.Default" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Border.Hover" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Border.Pressed" Color="#E5E5E5" />
+      <SolidColorBrush x:Key="Color.Border.PressedAlt" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Border.Disabled" Color="#BCBCBC" />
+      <SolidColorBrush x:Key="Color.Spinner.Color" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="Color.Shadow.Color" Color="#000000" />
+      <SolidColorBrush x:Key="Color.FilterPanel.Bg" Color="#292929" />
+      <SolidColorBrush x:Key="Color.FilterPanel.Border" Color="#3B3B3B" />
+      <SolidColorBrush x:Key="Color.ScrollArea.Bg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Statusbar.Bg" Color="#303030" />
+      <SolidColorBrush x:Key="Color.Window.Bg" Color="#1A1A1A" />
+      <SolidColorBrush x:Key="Color.Window.TitlebarBg" Color="#1A1A1A" />
+      <SolidColorBrush x:Key="Color.Dialog.Bg" Color="#2B2B2B" />
+      <SolidColorBrush x:Key="Color.Window.ButtonsRegionBg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Titlebtn.Fg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Titlebtn.FgHover" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Titlebtn.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Titlebtn.BgHover" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Titlebtn.BgPressed" Color="#3E3E40" />
+      <SolidColorBrush x:Key="Color.Closebtn.Fg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Closebtn.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Closebtn.BgHover" Color="#E81123" />
+      <SolidColorBrush x:Key="Color.Closebtn.BgPressed" Color="#F1707A" />
+      <SolidColorBrush x:Key="Color.Toolbar.Bg" Color="#1A1A1A" />
+      <SolidColorBrush x:Key="Color.Toolbar.Border" Color="#464646" />
+      <SolidColorBrush x:Key="Color.Toolbar.BadgeBg" Color="#606060" />
+      <SolidColorBrush x:Key="Color.Sidebar.Bg" Color="#2C2C2D" />
+      <SolidColorBrush x:Key="Color.Sidebar.SelectedBg" Color="#3F3F3F" />
+      <SolidColorBrush x:Key="Color.Btn.Fg" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="Color.Btn.Bg" Color="#373737" />
+      <SolidColorBrush x:Key="Color.Btn.Border" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Btn.Shadow" Color="#565656" />
+      <SolidColorBrush x:Key="Color.Btn.BgHover" Color="#242424" />
+      <SolidColorBrush x:Key="Color.Btn.BorderHover" Color="#434343" />
+      <SolidColorBrush x:Key="Color.Btn.BgPressed" Color="#202020" />
+      <SolidColorBrush x:Key="Color.Btn.BorderPressed" Color="#3D3D3D" />
+      <SolidColorBrush x:Key="Color.Btn.FgPressed" Color="#BABABA" />
+      <SolidColorBrush x:Key="Color.Btn.BgDisabled" Color="#343434" />
+      <SolidColorBrush x:Key="Color.Btn.BorderDisabled" Color="#383838" />
+      <SolidColorBrush x:Key="Color.Btn.FgDisabled" Color="#707070" />
+      <SolidColorBrush x:Key="Color.Toolbtn.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BorderHover" Color="#303030" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BgHover" Color="#303030" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BorderPressed" Color="#2A2A2A" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BgPressed" Color="#2A2A2A" />
+      <SolidColorBrush x:Key="Color.BigiconBtn.Bg" Color="#444444" />
+      <SolidColorBrush x:Key="Color.BigiconBtn.BgPressed" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Repocolor.NoneBg" Color="#454545" />
+      <SolidColorBrush x:Key="Color.Tabclose.Fg" Color="#838383" />
+      <SolidColorBrush x:Key="Color.Tabclose.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Tabclose.FgHover" Color="#A4A4A4" />
+      <SolidColorBrush x:Key="Color.Tabclose.FgPressed" Color="#C9C9C9" />
+      <SolidColorBrush x:Key="Color.Tabclose.BgHover" Color="#303030" />
+      <SolidColorBrush x:Key="Color.Tabclose.BgPressed" Color="#2A2A2A" />
+      <SolidColorBrush x:Key="Color.Input.Bg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Input.Border" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Cmdinput.LabelBg" Color="#B0B0B0" />
+      <SolidColorBrush x:Key="Color.Cmdinput.LabelFg" Color="#000000" />
+      <SolidColorBrush x:Key="Color.Check.Bg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Check.Border" Color="#6B6B6B" />
+      <SolidColorBrush x:Key="Color.Check.BgHover" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Check.BorderHover" Color="#6B6B6B" />
+      <SolidColorBrush x:Key="Color.Check.GlyphHover" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Check.BgPressed" Color="#3A3A3A" />
+      <SolidColorBrush x:Key="Color.Check.BorderPressed" Color="#4F4F4F" />
+      <SolidColorBrush x:Key="Color.Check.GlyphPressed" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Check.Glyph" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Check.BgDisabled" Color="#3C3C3C" />
+      <SolidColorBrush x:Key="Color.Check.BorderDisabled" Color="#434346" />
+      <SolidColorBrush x:Key="Color.Check.GlyphDisabled" Color="#ABABAB" />
+      <SolidColorBrush x:Key="Color.Radio.Dot" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Radio.DotPressed" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Radio.DotDisabled" Color="#ABABAB" />
+      <SolidColorBrush x:Key="Color.Mergecheck.Bg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Mergecheck.Border" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BgHover" Color="#3C3C3C" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BorderHover" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BgPressed" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BgDisabled" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BorderDisabled" Color="#ADB2B5" />
+      <SolidColorBrush x:Key="Color.Combo.PopupBorder" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Combo.PopupBg" Color="#1B1B1C" />
+      <SolidColorBrush x:Key="Color.Combo.Arrow" Color="#E8E6E6" />
+      <SolidColorBrush x:Key="Color.Combo.Bg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Combo.Border" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBorder" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBg" Color="#373737" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBorder" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Combo.ArrowPressed" Color="#E8E6E6" />
+      <SolidColorBrush x:Key="Color.Combo.BgOpen" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Combo.BorderOpen" Color="#404040" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBgOpen" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBorderOpen" Color="#404040" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBgOpen" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBorderOpen" Color="#404040" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgHover" Color="#525252" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderHover" Color="#525252" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgSelected" Color="#424242" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderSelected" Color="#424242" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgSelectedHover" Color="#424242" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderSelectedHover" Color="#424242" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgSelectedNofocus" Color="#424242" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderSelectedNofocus" Color="#424242" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgFocus" Color="#525252" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderFocus" Color="#525252" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgHoverFocus" Color="#525252" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderHoverFocus" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Combo.CompactHover" Color="#303030" />
+      <SolidColorBrush x:Key="Color.List.Bg" Color="#212121" />
+      <SolidColorBrush x:Key="Color.List.Border" Color="#525252" />
+      <SolidColorBrush x:Key="Color.List.BgDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.List.BorderDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Row.Bg" Color="#212121" />
+      <SolidColorBrush x:Key="Color.Row.BgHover" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Row.BorderHover" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Row.BgSelectedInactive" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Row.BorderSelectedInactive" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Row.BgSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.Row.BorderSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.Tree.Bg" Color="#212121" />
+      <SolidColorBrush x:Key="Color.TreeRow.Bg" Color="#212121" />
+      <SolidColorBrush x:Key="Color.TreeRow.Border" Color="#333333" />
+      <SolidColorBrush x:Key="Color.TreeRow.BgHover" Color="#333333" />
+      <SolidColorBrush x:Key="Color.TreeRow.BorderHover" Color="#333333" />
+      <SolidColorBrush x:Key="Color.TreeRow.BgSelectedInactive" Color="#525252" />
+      <SolidColorBrush x:Key="Color.TreeRow.BorderSelectedInactive" Color="#525252" />
+      <SolidColorBrush x:Key="Color.TreeRow.BgSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.TreeRow.BorderSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.Colheader.Bg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Colheader.Border" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Colheader.BgHover" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Colheader.BgPressed" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Tab.Fg" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Tab.FgSelected" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="Color.Tab.Bg" Color="#333333" />
+      <SolidColorBrush x:Key="Color.Tab.Border" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Tab.BgHover" Color="#383838" />
+      <SolidColorBrush x:Key="Color.Tab.BorderHover" Color="#383838" />
+      <SolidColorBrush x:Key="Color.Tab.ButtonHover" Color="#555555" />
+      <SolidColorBrush x:Key="Color.Tab.BgSelected" Color="#484848" />
+      <SolidColorBrush x:Key="Color.Tab.BorderSelected" Color="#424242" />
+      <SolidColorBrush x:Key="Color.Tab.BgDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Tab.BorderDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Tab.FgDisabled" Color="#878787" />
+      <SolidColorBrush x:Key="Color.Tab.ContentBorder" Color="#4D4D4D" />
+      <SolidColorBrush x:Key="Color.Repotab.Bg" Color="#101010" />
+      <SolidColorBrush x:Key="Color.Repotab.Border" Color="#404040" />
+      <SolidColorBrush x:Key="Color.Repotab.BgHover" Color="#1A1A1A" />
+      <SolidColorBrush x:Key="Color.Repotab.BorderHover" Color="#404040" />
+      <SolidColorBrush x:Key="Color.Repotab.BgSelected" Color="#2C2C2D" />
+      <SolidColorBrush x:Key="Color.Repotab.BorderSelected" Color="#404040" />
+      <SolidColorBrush x:Key="Color.Repotab.BgDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Repotab.BorderDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Repotab.TopBorder" Color="#282828" />
+      <SolidColorBrush x:Key="Color.Repotab.Separator" Color="#404040" />
+      <BoxShadows x:Key="Color.Repotab.Shadow">0 4 10 0 #CC000000</BoxShadows>
+      <SolidColorBrush x:Key="Color.Tabadd.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Menu.Bg" Color="#2C2C2C" />
+      <SolidColorBrush x:Key="Color.Menu.ItemHover" Color="#424242" />
+      <SolidColorBrush x:Key="Color.Scrollbar.Thumb" Color="#686868" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ThumbHover" Color="#B6B6B6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ThumbPressed" Color="#A6A6A6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.Arrow" Color="#686868" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ArrowHover" Color="#B6B6B6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ArrowPressed" Color="#A6A6A6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ArrowDisabled" Color="#CFCFCF" />
+      <SolidColorBrush x:Key="Color.Slider.TrackBorder" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Slider.Track" Color="#6A6A74" />
+      <SolidColorBrush x:Key="Color.Slider.Fg" Color="#CAC6C6" />
+      <SolidColorBrush x:Key="Color.Slider.Thumb" Color="#454545" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorder" Color="#6A6A74" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbHover" Color="#54545C" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorderHover" Color="#6A6A75" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbPressed" Color="#64646C" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorderPressed" Color="#7A7A74" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbDisabled" Color="#3C3C3C" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorderDisabled" Color="#434346" />
+      <SolidColorBrush x:Key="Color.Diff.AddedFg" Color="#2F8E39" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedFg" Color="#DA3D3D" />
+      <SolidColorBrush x:Key="Color.Diff.AddedBgUi" Color="#38563C" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedBgUi" Color="#633F3E" />
+      <SolidColorBrush x:Key="Color.Diff.FloatingButtonsBg" Color="#2B2B2B" />
+      <SolidColorBrush x:Key="Color.Editor.Bg" Color="#282828" />
+      <SolidColorBrush x:Key="Color.Editor.Fg" Color="#DDDDDD" />
+      <SolidColorBrush x:Key="Color.Editor.Link" Color="#3E95CF" />
+      <!-- Activity Manager popup: job output / error text line colours (dark column) -->
+      <SolidColorBrush x:Key="Color.Output.Command" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Output.Hint" Color="#98C278" />
+      <SolidColorBrush x:Key="Color.Output.Noise" Color="#ABABAB" />
+      <SolidColorBrush x:Key="Color.Output.Warning" Color="#FFCB00" />
+      <SolidColorBrush x:Key="Color.Output.Error" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Output.Default" Color="#DADADA" />
+      <SolidColorBrush x:Key="Color.Status.Removed" Color="#FF6663" />
+      <SolidColorBrush x:Key="Color.Status.Added" Color="#34C84A" />
+      <SolidColorBrush x:Key="Color.Search.MatchBg" Color="#B07600" />
+      <SolidColorBrush x:Key="Color.Search.MatchFg" Color="#B07600" />
+      <SolidColorBrush x:Key="Color.Revlist.UnreachableFg" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Revlist.CodeBg" Color="#404040" />
+      <SolidColorBrush x:Key="Color.Revlist.CodeBgSelected" Color="#59444444" />
+      <SolidColorBrush x:Key="Color.Revlist.BodyIndicator" Color="#ABABAB" />
+      <SolidColorBrush x:Key="Color.Revlist.BodyIndicatorSelected" Color="#ABABAB" />
+      <SolidColorBrush x:Key="Color.Timeline.Label" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="Color.Timeline.Commit" Color="#626262" />
+      <SolidColorBrush x:Key="Color.Timeline.Tick" Color="#6A6A75" />
+      <SolidColorBrush x:Key="Color.Timeline.AltBand" Color="#464646" />
+      <SolidColorBrush x:Key="Color.Ref.TagBorder" Color="#B5B1F6" />
+      <SolidColorBrush x:Key="Color.Ref.TagBg" Color="#3E3F4E" />
+      <SolidColorBrush x:Key="Color.Ref.StashBorder" Color="#C2C2C2" />
+      <SolidColorBrush x:Key="Color.Ref.StashBg" Color="#545454" />
+      <SolidColorBrush x:Key="Color.Ref.BisectGoodBorder" Color="#99DA99" />
+      <SolidColorBrush x:Key="Color.Ref.BisectGoodBg" Color="#2F553F" />
+      <SolidColorBrush x:Key="Color.Ref.BisectBadBorder" Color="#FFA0A0" />
+      <SolidColorBrush x:Key="Color.Ref.BisectBadBg" Color="#6C3232" />
+      <SolidColorBrush x:Key="Color.Ref.BisectSkipBorder" Color="#C2C2C2" />
+      <SolidColorBrush x:Key="Color.Ref.BisectSkipBg" Color="#3D3D3F" />
+      <SolidColorBrush x:Key="Color.Ref.DetailBorder" Color="#C2C2C2" />
+      <SolidColorBrush x:Key="Color.Ref.DetailBg" Color="#545454" />
+      <SolidColorBrush x:Key="Color.Filetype.FallbackBg" Color="#555658" />
+      <SolidColorBrush x:Key="Color.Binarydiff.Bg" Color="#555555" />
+      <SolidColorBrush x:Key="Color.Binarydiff.Border" Color="#454545" />
+      <SolidColorBrush x:Key="Color.Binarydiff.ProgressBg" Color="#333333" />
+      <!-- checkerboard behind images, a 16 px tile of four 8 px squares. -->
+      <DrawingBrush x:Key="ImageDiff.Checker" TileMode="Tile" DestinationRect="0,0,16,16">
+        <DrawingBrush.Drawing>
+          <DrawingGroup>
+            <DrawingGroup.Children>
+              <GeometryDrawing Brush="#CECECE" Geometry="M0,0 H16 V16 H0 Z" />
+              <GeometryDrawing Brush="#989898" Geometry="M8,0 H16 V8 H8 Z M0,8 H8 V16 H0 Z" />
+            </DrawingGroup.Children>
+          </DrawingGroup>
+        </DrawingBrush.Drawing>
+      </DrawingBrush>
+      <SolidColorBrush x:Key="Color.Subjectlen.Ok" Color="#808080" />
+      <SolidColorBrush x:Key="Color.Subjectlen.Warn" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Subjectlen.Error" Color="#FF0000" />
+      <SolidColorBrush x:Key="Color.Signal.Green" Color="#34C84A" />
+      <SolidColorBrush x:Key="Color.Signal.Yellow" Color="#FDBE41" />
+      <SolidColorBrush x:Key="Color.Signal.Red" Color="#FA4B49" />
+      <SolidColorBrush x:Key="Color.Signal.Gray" Color="#E1E1E1" />
+      <SolidColorBrush x:Key="Color.Calendar.Bg" Color="#333337" />
+      <SolidColorBrush x:Key="Color.Calendar.Border" Color="#6A6A75" />
+      <SolidColorBrush x:Key="Color.Calendar.Disabled" Color="#A6FFFFFF" />
+      <SolidColorBrush x:Key="Color.Calendar.SelectedBg" Color="#525252" />
+      <SolidColorBrush x:Key="Color.Calendar.DayFg" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="Color.Calendar.DayFgInactive" Color="#B2B2B2" />
+
+      <!-- branch ref labels, dark theme -->
+      <SolidColorBrush x:Key="Color.RefLabel.Border.0" Color="#F28B1F" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.1" Color="#BF9A2F" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.2" Color="#CB2327" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.3" Color="#A68357" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.4" Color="#27A649" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.5" Color="#0082BA" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.6" Color="#9D53A0" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.7" Color="#6D6D6E" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.8" Color="#CC1F56" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.9" Color="#20A89E" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.10" Color="#4A48B0" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.11" Color="#8DAA28" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.12" Color="#E05A4D" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.0" Color="#5D3D14" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.1" Color="#5B4C0E" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.2" Color="#5F2425" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.3" Color="#433A32" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.4" Color="#285224" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.5" Color="#13445B" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.6" Color="#503455" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.7" Color="#3D3D3F" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.8" Color="#601E35" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.9" Color="#1A4A45" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.10" Color="#272650" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.11" Color="#3D4E1A" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.12" Color="#5D2A24" />
+
+      <!-- diff colours, dark theme -->
+      <SolidColorBrush x:Key="Color.Diff.AddedLine" Color="#3A5C3F" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedLine" Color="#633F3E" />
+      <SolidColorBrush x:Key="Color.Diff.AddedWords" Color="#388442" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedWords" Color="#9F4247" />
+      <SolidColorBrush x:Key="Color.Diff.ServiceLine" Color="#959595" />
+      <SolidColorBrush x:Key="Color.Diff.Filler" Color="#424242" />
+      <SolidColorBrush x:Key="Color.Diff.LineNumber" Color="#A0A0A0" />
+      <SolidColorBrush x:Key="Color.Diff.GutterLine" Color="#6E6E6E" />
+      <SolidColorBrush x:Key="Color.Diff.ChunkBorder" Color="#419BF9" />
+      <SolidColorBrush x:Key="Color.Diff.ChunkFill" Color="#14358CFF" />
+
+      <!-- merge (conflict) editor, dark theme; filler rows use Color.Diff.Filler -->
+      <SolidColorBrush x:Key="Color.Merge.Theirs" Color="#5C5C76" />
+      <SolidColorBrush x:Key="Color.Merge.Ours" Color="#354E59" />
+      <SolidColorBrush x:Key="Color.Merge.Added" Color="#3E553E" />
+      <SolidColorBrush x:Key="Color.Merge.Removed" Color="#5E403F" />
+      <SolidColorBrush x:Key="Color.Merge.Unresolved" Color="#A74946" />
+      <SolidColorBrush x:Key="Color.Merge.HoverTag" Color="#A5A5A5" />
+
+      <!-- syntax highlighting, dark theme -->
+      <SolidColorBrush x:Key="Color.Syntax.Comment" Color="#9198A1" />
+      <SolidColorBrush x:Key="Color.Syntax.String" Color="#CF9F89" />
+      <SolidColorBrush x:Key="Color.Syntax.Keyword" Color="#649BD1" />
+      <SolidColorBrush x:Key="Color.Syntax.Type" Color="#649BD1" />
+      <SolidColorBrush x:Key="Color.Syntax.Command" Color="#649BD1" />
+      <SolidColorBrush x:Key="Color.Syntax.Attribute" Color="#E64C80" />
+      <SolidColorBrush x:Key="Color.Syntax.Variable" Color="#649BD1" />
+      <SolidColorBrush x:Key="Color.Syntax.Value" Color="#BED5A8" />
+      <SolidColorBrush x:Key="Color.Syntax.Number" Color="#BED5A8" />
+
+      <!-- FluentTheme keys mapped to the tokens above, so stock controls follow the tokens (one accent colour, no shade variants). -->
+      <Color x:Key="SystemAccentColor">#3E9FF8</Color>
+      <Color x:Key="SystemAccentColorLight1">#3E9FF8</Color>
+      <Color x:Key="SystemAccentColorLight2">#3E9FF8</Color>
+      <Color x:Key="SystemAccentColorLight3">#3E9FF8</Color>
+      <Color x:Key="SystemAccentColorDark1">#3E9FF8</Color>
+      <Color x:Key="SystemAccentColorDark2">#3E9FF8</Color>
+      <Color x:Key="SystemAccentColorDark3">#3E9FF8</Color>
+      <SolidColorBrush x:Key="ButtonBackground" Color="#373737" />
+      <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#373737" />
+      <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#202020" />
+      <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#343434" />
+      <SolidColorBrush x:Key="ButtonBorderBrush" Color="#525252" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#525252" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#3D3D3D" />
+      <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#383838" />
+      <SolidColorBrush x:Key="ButtonForeground" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#BABABA" />
+      <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#707070" />
+      <SolidColorBrush x:Key="TextControlBackground" Color="#333333" />
+      <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#333333" />
+      <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#333333" />
+      <SolidColorBrush x:Key="TextControlBorderBrush" Color="#525252" />
+      <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#525252" />
+      <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#3E9FF8" />
+      <SolidColorBrush x:Key="TextControlForeground" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#EAE8E8" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#8FEAE8E8" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#8FEAE8E8" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#8FEAE8E8" />
+      <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#2C2C2C" />
+      <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#525252" />
+      <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="#424242" />
+      <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#424242" />
+      <SolidColorBrush x:Key="MenuFlyoutItemForegroundDisabled" Color="#ABABAB" />
+      <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" Color="#B3CAC6C6" />
+      <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" Color="#B3CAC6C6" />
+      <SolidColorBrush x:Key="ToolTipBackground" Color="#333333" />
+      <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#525252" />
+      <SolidColorBrush x:Key="ToolTipForeground" Color="#EAE8E8" />
+      <Color x:Key="ScrollBarThumbBackgroundColor">#686868</Color>
+      <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#B6B6B6" />
+      <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#A6A6A6" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Light">
+      <!-- tokens -->
+      <SolidColorBrush x:Key="Color.Text.Primary" Color="#222222" />
+      <SolidColorBrush x:Key="Color.Text.Fg" Color="#222222" />
+      <SolidColorBrush x:Key="Color.Text.Secondary" Color="#808080" />
+      <SolidColorBrush x:Key="Color.Text.Muted" Color="#9F9797" />
+      <SolidColorBrush x:Key="Color.Text.Dim" Color="#696969" />
+      <SolidColorBrush x:Key="Color.Text.OnAccent" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Text.Disabled" Color="#ABABAB" />
+      <SolidColorBrush x:Key="Color.Text.DialogDescription" Color="#444444" />
+      <SolidColorBrush x:Key="Color.Text.RefLabel" Color="#202020" />
+      <SolidColorBrush x:Key="Color.Text.Window" Color="#000000" />
+      <SolidColorBrush x:Key="Color.Text.Toolbar" Color="#808080" />
+      <SolidColorBrush x:Key="Color.Text.MainMenu" Color="#595959" />
+      <SolidColorBrush x:Key="Color.Text.Link" Color="#007ACC" />
+      <SolidColorBrush x:Key="Color.Icon.Default" Color="#7B7A7A" />
+      <SolidColorBrush x:Key="Color.Glyph.Default" Color="#777777" />
+      <SolidColorBrush x:Key="Color.Glyph.Disabled" Color="#C6C6C6" />
+      <SolidColorBrush x:Key="Color.Accent.Base" Color="#007ACC" />
+      <SolidColorBrush x:Key="Color.Accent.Secondary" Color="#3E9FF8" />
+      <SolidColorBrush x:Key="Color.Accent.WindowBorder" Color="#3BACED" />
+      <SolidColorBrush x:Key="Color.Surface.Base" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Surface.EmptyState" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Surface.Panel" Color="#FBFBFB" />
+      <SolidColorBrush x:Key="Color.Surface.HeaderStrip" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Surface.Tile" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Surface.TileAlt" Color="#FBFBFB" />
+      <SolidColorBrush x:Key="Color.Border.Tile" Color="#E7E7E7" />
+      <SolidColorBrush x:Key="Color.Surface.Sunken" Color="#F3F3F3" />
+      <SolidColorBrush x:Key="Color.Surface.Hover" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Surface.Pressed" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.Surface.Disabled" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.Surface.Group" Color="#ECECEC" />
+      <SolidColorBrush x:Key="Color.Border.Default" Color="#E5E5E5" />
+      <SolidColorBrush x:Key="Color.Border.Hover" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Border.Pressed" Color="#E5E5E5" />
+      <SolidColorBrush x:Key="Color.Border.PressedAlt" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Border.Disabled" Color="#BCBCBC" />
+      <SolidColorBrush x:Key="Color.Spinner.Color" Color="#444444" />
+      <SolidColorBrush x:Key="Color.Shadow.Color" Color="#696969" />
+      <SolidColorBrush x:Key="Color.FilterPanel.Bg" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.FilterPanel.Border" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.ScrollArea.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Statusbar.Bg" Color="#E6E6E6" />
+      <SolidColorBrush x:Key="Color.Window.Bg" Color="#F3F3F3" />
+      <SolidColorBrush x:Key="Color.Window.TitlebarBg" Color="#F3F3F3" />
+      <SolidColorBrush x:Key="Color.Dialog.Bg" Color="#F3F3F3" />
+      <SolidColorBrush x:Key="Color.Window.ButtonsRegionBg" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.Titlebtn.Fg" Color="#000000" />
+      <SolidColorBrush x:Key="Color.Titlebtn.FgHover" Color="#000000" />
+      <SolidColorBrush x:Key="Color.Titlebtn.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Titlebtn.BgHover" Color="#E5E5E5" />
+      <SolidColorBrush x:Key="Color.Titlebtn.BgPressed" Color="#CACACB" />
+      <SolidColorBrush x:Key="Color.Closebtn.Fg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Closebtn.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Closebtn.BgHover" Color="#E81123" />
+      <SolidColorBrush x:Key="Color.Closebtn.BgPressed" Color="#F1707A" />
+      <SolidColorBrush x:Key="Color.Toolbar.Bg" Color="#F3F3F3" />
+      <SolidColorBrush x:Key="Color.Toolbar.Border" Color="#F3F3F3" />
+      <SolidColorBrush x:Key="Color.Toolbar.BadgeBg" Color="#A0A0A0" />
+      <SolidColorBrush x:Key="Color.Sidebar.Bg" Color="#FAFAFA" />
+      <SolidColorBrush x:Key="Color.Sidebar.SelectedBg" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.Btn.Fg" Color="#222222" />
+      <SolidColorBrush x:Key="Color.Btn.Bg" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="Color.Btn.Border" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Btn.Shadow" Color="#B7B8B9" />
+      <SolidColorBrush x:Key="Color.Btn.BgHover" Color="#F2F2F2" />
+      <SolidColorBrush x:Key="Color.Btn.BorderHover" Color="#EBEBEB" />
+      <SolidColorBrush x:Key="Color.Btn.BgPressed" Color="#ECECEC" />
+      <SolidColorBrush x:Key="Color.Btn.BorderPressed" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Btn.FgPressed" Color="#585858" />
+      <SolidColorBrush x:Key="Color.Btn.BgDisabled" Color="#FAFBFC" />
+      <SolidColorBrush x:Key="Color.Btn.BorderDisabled" Color="#EDEFF0" />
+      <SolidColorBrush x:Key="Color.Btn.FgDisabled" Color="#ABACAC" />
+      <SolidColorBrush x:Key="Color.Toolbtn.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BorderHover" Color="#EAEAEA" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BgHover" Color="#EAEAEA" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BorderPressed" Color="#D5D5D5" />
+      <SolidColorBrush x:Key="Color.Toolbtn.BgPressed" Color="#D5D5D5" />
+      <SolidColorBrush x:Key="Color.BigiconBtn.Bg" Color="#F5F5F5" />
+      <SolidColorBrush x:Key="Color.BigiconBtn.BgPressed" Color="#C9E0F7" />
+      <SolidColorBrush x:Key="Color.Repocolor.NoneBg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Tabclose.Fg" Color="#838383" />
+      <SolidColorBrush x:Key="Color.Tabclose.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Tabclose.FgHover" Color="#737373" />
+      <SolidColorBrush x:Key="Color.Tabclose.FgPressed" Color="#636363" />
+      <SolidColorBrush x:Key="Color.Tabclose.BgHover" Color="#E3E3E3" />
+      <SolidColorBrush x:Key="Color.Tabclose.BgPressed" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.Input.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Input.Border" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Cmdinput.LabelBg" Color="#E1E1E1" />
+      <SolidColorBrush x:Key="Color.Cmdinput.LabelFg" Color="#000000" />
+      <SolidColorBrush x:Key="Color.Check.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Check.Border" Color="#BEBEBE" />
+      <SolidColorBrush x:Key="Color.Check.BgHover" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Check.BorderHover" Color="#BEBEBE" />
+      <SolidColorBrush x:Key="Color.Check.GlyphHover" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Check.BgPressed" Color="#E2E4E5" />
+      <SolidColorBrush x:Key="Color.Check.BorderPressed" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Check.GlyphPressed" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Check.Glyph" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Check.BgDisabled" Color="#E6E6E6" />
+      <SolidColorBrush x:Key="Color.Check.BorderDisabled" Color="#BCBCBC" />
+      <SolidColorBrush x:Key="Color.Check.GlyphDisabled" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Radio.Dot" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Radio.DotPressed" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Radio.DotDisabled" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Mergecheck.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Mergecheck.Border" Color="#DADAD7" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BgHover" Color="#FBFBFB" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BorderHover" Color="#DADAD7" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BgPressed" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BgDisabled" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.Mergecheck.BorderDisabled" Color="#ADB2B5" />
+      <SolidColorBrush x:Key="Color.Combo.PopupBorder" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Combo.PopupBg" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="Color.Combo.Arrow" Color="#808080" />
+      <SolidColorBrush x:Key="Color.Combo.Bg" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="Color.Combo.Border" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBorder" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBg" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBorder" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Combo.ArrowPressed" Color="#585858" />
+      <SolidColorBrush x:Key="Color.Combo.BgOpen" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="Color.Combo.BorderOpen" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBgOpen" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Combo.EditableBorderOpen" Color="#CECECE" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBgOpen" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="Color.Combo.EditableButtonBorderOpen" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgHover" Color="#EEEEEE" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderHover" Color="#EEEEEE" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgSelected" Color="#DFDFDF" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderSelected" Color="#DFDFDF" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgSelectedHover" Color="#DFDFDF" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderSelectedHover" Color="#DFDFDF" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgSelectedNofocus" Color="#DFDFDF" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderSelectedNofocus" Color="#DFDFDF" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgFocus" Color="#EEEEEE" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderFocus" Color="#EEEEEE" />
+      <SolidColorBrush x:Key="Color.ComboItem.BgHoverFocus" Color="#EEEEEE" />
+      <SolidColorBrush x:Key="Color.ComboItem.BorderHoverFocus" Color="#EEEEEE" />
+      <SolidColorBrush x:Key="Color.Combo.CompactHover" Color="#F2F2F2" />
+      <SolidColorBrush x:Key="Color.List.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.List.Border" Color="#E5E5E5" />
+      <SolidColorBrush x:Key="Color.List.BgDisabled" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.List.BorderDisabled" Color="#BCBCBC" />
+      <SolidColorBrush x:Key="Color.Row.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Row.BgHover" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Row.BorderHover" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Row.BgSelectedInactive" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.Row.BorderSelectedInactive" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.Row.BgSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.Row.BorderSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.Tree.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.TreeRow.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.TreeRow.Border" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.TreeRow.BgHover" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.TreeRow.BorderHover" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.TreeRow.BgSelectedInactive" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.TreeRow.BorderSelectedInactive" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.TreeRow.BgSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.TreeRow.BorderSelected" Color="#236BD2" />
+      <SolidColorBrush x:Key="Color.Colheader.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Colheader.Border" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.Colheader.BgHover" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Colheader.BgPressed" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Tab.Fg" Color="#444444" />
+      <SolidColorBrush x:Key="Color.Tab.FgSelected" Color="#444444" />
+      <SolidColorBrush x:Key="Color.Tab.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Tab.Border" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Tab.BgHover" Color="#E3E3E3" />
+      <SolidColorBrush x:Key="Color.Tab.BorderHover" Color="#E3E3E3" />
+      <SolidColorBrush x:Key="Color.Tab.ButtonHover" Color="#ECECEC" />
+      <SolidColorBrush x:Key="Color.Tab.BgSelected" Color="#F6F6F6" />
+      <SolidColorBrush x:Key="Color.Tab.BorderSelected" Color="#F6F6F6" />
+      <SolidColorBrush x:Key="Color.Tab.BgDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Tab.BorderDisabled" Color="#E5E5E5" />
+      <SolidColorBrush x:Key="Color.Tab.FgDisabled" Color="#C3C3C3" />
+      <SolidColorBrush x:Key="Color.Tab.ContentBorder" Color="#9C9C9C" />
+      <SolidColorBrush x:Key="Color.Repotab.Bg" Color="#DDDDDD" />
+      <SolidColorBrush x:Key="Color.Repotab.Border" Color="#CFCFCF" />
+      <SolidColorBrush x:Key="Color.Repotab.BgHover" Color="#D7D7D7" />
+      <SolidColorBrush x:Key="Color.Repotab.BorderHover" Color="#CFCFCF" />
+      <SolidColorBrush x:Key="Color.Repotab.BgSelected" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Repotab.BorderSelected" Color="#CFCFCF" />
+      <SolidColorBrush x:Key="Color.Repotab.BgDisabled" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Repotab.BorderDisabled" Color="#C2C2C2" />
+      <SolidColorBrush x:Key="Color.Repotab.TopBorder" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="Color.Repotab.Separator" Color="#C2C2C2" />
+      <BoxShadows x:Key="Color.Repotab.Shadow">0 4 10 0 #4D000000</BoxShadows>
+      <SolidColorBrush x:Key="Color.Tabadd.Bg" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Menu.Bg" Color="#F6F6F6" />
+      <SolidColorBrush x:Key="Color.Menu.ItemHover" Color="#E6E6E6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.Thumb" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ThumbHover" Color="#B6B6B6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ThumbPressed" Color="#A6A6A6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.Arrow" Color="#D9D9D9" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ArrowHover" Color="#B6B6B6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ArrowPressed" Color="#A6A6A6" />
+      <SolidColorBrush x:Key="Color.Scrollbar.ArrowDisabled" Color="#CFCFCF" />
+      <SolidColorBrush x:Key="Color.Slider.TrackBorder" Color="Transparent" />
+      <SolidColorBrush x:Key="Color.Slider.Track" Color="#ACACAC" />
+      <SolidColorBrush x:Key="Color.Slider.Fg" Color="#808080" />
+      <SolidColorBrush x:Key="Color.Slider.Thumb" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorder" Color="#ACACAC" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbHover" Color="#E8EFF7" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorderHover" Color="#C6DEF8" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbPressed" Color="#C9E0F7" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorderPressed" Color="#95C1ED" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbDisabled" Color="#F4F4F4" />
+      <SolidColorBrush x:Key="Color.Slider.ThumbBorderDisabled" Color="#ADB2B5" />
+      <SolidColorBrush x:Key="Color.Diff.AddedFg" Color="#008000" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedFg" Color="#FF0000" />
+      <SolidColorBrush x:Key="Color.Diff.AddedBgUi" Color="#E2FDE3" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedBgUi" Color="#FFE5E5" />
+      <SolidColorBrush x:Key="Color.Diff.FloatingButtonsBg" Color="#EAEAEA" />
+      <SolidColorBrush x:Key="Color.Editor.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Editor.Fg" Color="#464646" />
+      <SolidColorBrush x:Key="Color.Editor.Link" Color="#2900FF" />
+      <!-- Activity Manager popup: job output / error text line colours (light column) -->
+      <SolidColorBrush x:Key="Color.Output.Command" Color="#000000" />
+      <SolidColorBrush x:Key="Color.Output.Hint" Color="#54A353" />
+      <SolidColorBrush x:Key="Color.Output.Noise" Color="#9F9797" />
+      <SolidColorBrush x:Key="Color.Output.Warning" Color="#FF9000" />
+      <SolidColorBrush x:Key="Color.Output.Error" Color="#000000" />
+      <SolidColorBrush x:Key="Color.Output.Default" Color="#595959" />
+      <SolidColorBrush x:Key="Color.Status.Removed" Color="#FF6663" />
+      <SolidColorBrush x:Key="Color.Status.Added" Color="#34C84A" />
+      <SolidColorBrush x:Key="Color.Search.MatchBg" Color="#FEE44A" />
+      <SolidColorBrush x:Key="Color.Search.MatchFg" Color="#FEE44A" />
+      <SolidColorBrush x:Key="Color.Revlist.UnreachableFg" Color="#999999" />
+      <SolidColorBrush x:Key="Color.Revlist.CodeBg" Color="#F5F5F5" />
+      <SolidColorBrush x:Key="Color.Revlist.CodeBgSelected" Color="#59EBEBEB" />
+      <SolidColorBrush x:Key="Color.Revlist.BodyIndicator" Color="#9F9797" />
+      <SolidColorBrush x:Key="Color.Revlist.BodyIndicatorSelected" Color="#CAC6C6" />
+      <SolidColorBrush x:Key="Color.Timeline.Label" Color="#2A2A2A" />
+      <SolidColorBrush x:Key="Color.Timeline.Commit" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="Color.Timeline.Tick" Color="#CBCBCB" />
+      <SolidColorBrush x:Key="Color.Timeline.AltBand" Color="#E8E8E8" />
+      <SolidColorBrush x:Key="Color.Ref.TagBorder" Color="#B5B1F6" />
+      <SolidColorBrush x:Key="Color.Ref.TagBg" Color="#F6F5FE" />
+      <SolidColorBrush x:Key="Color.Ref.StashBorder" Color="#C2C2C2" />
+      <SolidColorBrush x:Key="Color.Ref.StashBg" Color="#F7F7F7" />
+      <SolidColorBrush x:Key="Color.Ref.BisectGoodBorder" Color="#99DA99" />
+      <SolidColorBrush x:Key="Color.Ref.BisectGoodBg" Color="#F0FFF0" />
+      <SolidColorBrush x:Key="Color.Ref.BisectBadBorder" Color="#FFA0A0" />
+      <SolidColorBrush x:Key="Color.Ref.BisectBadBg" Color="#FFECEC" />
+      <SolidColorBrush x:Key="Color.Ref.BisectSkipBorder" Color="#8E8E91" />
+      <SolidColorBrush x:Key="Color.Ref.BisectSkipBg" Color="#F1F1F1" />
+      <SolidColorBrush x:Key="Color.Ref.DetailBorder" Color="#C2C2C2" />
+      <SolidColorBrush x:Key="Color.Ref.DetailBg" Color="#F7F7F7" />
+      <SolidColorBrush x:Key="Color.Filetype.FallbackBg" Color="#E9E9E9" />
+      <SolidColorBrush x:Key="Color.Binarydiff.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Binarydiff.Border" Color="#D3D3D3" />
+      <SolidColorBrush x:Key="Color.Binarydiff.ProgressBg" Color="#E6E6E6" />
+      <!-- checkerboard behind images, a 16 px tile of four 8 px squares. -->
+      <DrawingBrush x:Key="ImageDiff.Checker" TileMode="Tile" DestinationRect="0,0,16,16">
+        <DrawingBrush.Drawing>
+          <DrawingGroup>
+            <DrawingGroup.Children>
+              <GeometryDrawing Brush="#FFFFFF" Geometry="M0,0 H16 V16 H0 Z" />
+              <GeometryDrawing Brush="#D6D6D6" Geometry="M8,0 H16 V8 H8 Z M0,8 H8 V16 H0 Z" />
+            </DrawingGroup.Children>
+          </DrawingGroup>
+        </DrawingBrush.Drawing>
+      </DrawingBrush>
+      <SolidColorBrush x:Key="Color.Subjectlen.Ok" Color="#A9A9A9" />
+      <SolidColorBrush x:Key="Color.Subjectlen.Warn" Color="#808080" />
+      <SolidColorBrush x:Key="Color.Subjectlen.Error" Color="#FF0000" />
+      <SolidColorBrush x:Key="Color.Signal.Green" Color="#34C84A" />
+      <SolidColorBrush x:Key="Color.Signal.Yellow" Color="#FDBE41" />
+      <SolidColorBrush x:Key="Color.Signal.Red" Color="#FA4B49" />
+      <SolidColorBrush x:Key="Color.Signal.Gray" Color="#E1E1E1" />
+      <SolidColorBrush x:Key="Color.Calendar.Bg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Color.Calendar.Border" Color="#ACACAC" />
+      <SolidColorBrush x:Key="Color.Calendar.Disabled" Color="#A6FFFFFF" />
+      <SolidColorBrush x:Key="Color.Calendar.SelectedBg" Color="#E8EFF7" />
+      <SolidColorBrush x:Key="Color.Calendar.DayFg" Color="#222222" />
+      <SolidColorBrush x:Key="Color.Calendar.DayFgInactive" Color="#808080" />
+
+      <!-- branch ref labels, light theme -->
+      <SolidColorBrush x:Key="Color.RefLabel.Border.0" Color="#FF9502" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.1" Color="#FFCC00" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.2" Color="#FF3B30" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.3" Color="#A2845E" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.4" Color="#64DA38" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.5" Color="#1CADF8" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.6" Color="#CB73E1" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.7" Color="#8E8E91" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.8" Color="#FF2968" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.9" Color="#30D5C8" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.10" Color="#5856D6" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.11" Color="#B4D435" />
+      <SolidColorBrush x:Key="Color.RefLabel.Border.12" Color="#FF6F61" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.0" Color="#FFF2DD" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.1" Color="#FFF9DC" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.2" Color="#FFE5E4" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.3" Color="#F3F0EA" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.4" Color="#E9FBE4" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.5" Color="#DFF5FF" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.6" Color="#FAECFC" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.7" Color="#F1F1F1" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.8" Color="#FFE3EC" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.9" Color="#DEF7F5" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.10" Color="#E5E5F7" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.11" Color="#F2F9DE" />
+      <SolidColorBrush x:Key="Color.RefLabel.Fill.12" Color="#FFE5E2" />
+
+      <!-- diff colours, light theme -->
+      <SolidColorBrush x:Key="Color.Diff.AddedLine" Color="#E2FDE3" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedLine" Color="#FFE5E5" />
+      <SolidColorBrush x:Key="Color.Diff.AddedWords" Color="#BDF3BD" />
+      <SolidColorBrush x:Key="Color.Diff.RemovedWords" Color="#FEC4C5" />
+      <SolidColorBrush x:Key="Color.Diff.ServiceLine" Color="#C4C4C4" />
+      <SolidColorBrush x:Key="Color.Diff.Filler" Color="#F9F9F9" />
+      <SolidColorBrush x:Key="Color.Diff.LineNumber" Color="#C0C0C0" />
+      <SolidColorBrush x:Key="Color.Diff.GutterLine" Color="#DADAD7" />
+      <SolidColorBrush x:Key="Color.Diff.ChunkBorder" Color="#419BF9" />
+      <SolidColorBrush x:Key="Color.Diff.ChunkFill" Color="#3CE6F1FF" />
+
+      <!-- merge (conflict) editor, light theme; filler rows use Color.Diff.Filler -->
+      <SolidColorBrush x:Key="Color.Merge.Theirs" Color="#E6E7F5" />
+      <SolidColorBrush x:Key="Color.Merge.Ours" Color="#E2F0F5" />
+      <SolidColorBrush x:Key="Color.Merge.Added" Color="#F0FDEF" />
+      <SolidColorBrush x:Key="Color.Merge.Removed" Color="#FDF0EF" />
+      <SolidColorBrush x:Key="Color.Merge.Unresolved" Color="#FFC4C4" />
+      <SolidColorBrush x:Key="Color.Merge.HoverTag" Color="#D8D8D8" />
+
+      <!-- syntax highlighting, light theme -->
+      <SolidColorBrush x:Key="Color.Syntax.Comment" Color="#787878" />
+      <SolidColorBrush x:Key="Color.Syntax.String" Color="#1D5DBE" />
+      <SolidColorBrush x:Key="Color.Syntax.Keyword" Color="#C14047" />
+      <SolidColorBrush x:Key="Color.Syntax.Type" Color="#1D5DBE" />
+      <SolidColorBrush x:Key="Color.Syntax.Command" Color="#6848BA" />
+      <SolidColorBrush x:Key="Color.Syntax.Attribute" Color="#C14047" />
+      <SolidColorBrush x:Key="Color.Syntax.Variable" Color="#6848BA" />
+      <SolidColorBrush x:Key="Color.Syntax.Value" Color="#0759D4" />
+      <SolidColorBrush x:Key="Color.Syntax.Number" Color="#0759D4" />
+
+      <!-- FluentTheme keys mapped to the tokens above, so stock controls follow the tokens (one accent colour, no shade variants). -->
+      <Color x:Key="SystemAccentColor">#007ACC</Color>
+      <Color x:Key="SystemAccentColorLight1">#007ACC</Color>
+      <Color x:Key="SystemAccentColorLight2">#007ACC</Color>
+      <Color x:Key="SystemAccentColorLight3">#007ACC</Color>
+      <Color x:Key="SystemAccentColorDark1">#007ACC</Color>
+      <Color x:Key="SystemAccentColorDark2">#007ACC</Color>
+      <Color x:Key="SystemAccentColorDark3">#007ACC</Color>
+      <SolidColorBrush x:Key="ButtonBackground" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#FDFDFD" />
+      <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#ECECEC" />
+      <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#FAFBFC" />
+      <SolidColorBrush x:Key="ButtonBorderBrush" Color="#CECECE" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#CECECE" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#CECECE" />
+      <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#EDEFF0" />
+      <SolidColorBrush x:Key="ButtonForeground" Color="#222222" />
+      <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#222222" />
+      <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#585858" />
+      <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#ABACAC" />
+      <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="TextControlBorderBrush" Color="#CECECE" />
+      <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#CECECE" />
+      <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#007ACC" />
+      <SolidColorBrush x:Key="TextControlForeground" Color="#222222" />
+      <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#222222" />
+      <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#222222" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#8F222222" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#8F222222" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#8F222222" />
+      <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#F6F6F6" />
+      <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#E5E5E5" />
+      <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="#E6E6E6" />
+      <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#E6E6E6" />
+      <SolidColorBrush x:Key="MenuFlyoutItemForegroundDisabled" Color="#ABABAB" />
+      <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" Color="#B39F9797" />
+      <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" Color="#B39F9797" />
+      <SolidColorBrush x:Key="ToolTipBackground" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#CECECE" />
+      <SolidColorBrush x:Key="ToolTipForeground" Color="#222222" />
+      <Color x:Key="ScrollBarThumbBackgroundColor">#D9D9D9</Color>
+      <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#B6B6B6" />
+      <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#A6A6A6" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

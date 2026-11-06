@@ -1,0 +1,272 @@
+<!--
+  GerGit control styles on top of FluentTheme. Colours come from Colors.axaml
+  (always DynamicResource). Style classes used by the views:
+    Button.toolbar / Button.toolbar-arrow  toolbar buttons (icon above an 11 px caption)
+    Button.icon                            icon-only button (transparent, toolbar hover colours)
+    Button.tabclose                        close button on a repository tab
+    Border.badge                           Pull/Push count badge
+    TextBlock.caption                      toolbar caption
+    TextBlock.description                  dialog description text
+    TextBlock.empty-title / empty-text     empty-state texts
+    TextBox.filter                         22 px filter box
+    GridSplitter.h / GridSplitter.v        5 px hit area, 1 px visible line
+    ListBox.tabs                           repository tab strip
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:GerGit.Controls">
+
+  <!-- window default 12 px UI font -->
+  <Style Selector=":is(Window)">
+    <Setter Property="FontFamily" Value="{DynamicResource Font.UI}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Background" Value="{DynamicResource Color.Window.Bg}" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+  </Style>
+
+  <Style Selector="ToolTip">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Padding" Value="6,2,6,3" />
+    <Setter Property="CornerRadius" Value="3" />
+  </Style>
+
+  <!-- standard button (colours via the Fluent resource overrides in Colors.axaml) -->
+  <Style Selector="Button">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button:pressed">
+    <Setter Property="RenderTransform" Value="{x:Null}" />
+  </Style>
+
+  <!-- toolbar buttons -->
+  <!-- Padding 6 instead of 10: Inter is a wide font, and with 10 the buttons do not
+       fit beside the 300 px status box at the default 1000 px window width. -->
+  <Style Selector="Button.toolbar, Button.toolbar-arrow">
+    <Setter Property="Height" Value="34" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="6,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Toolbar}" />
+  </Style>
+  <Style Selector="Button.toolbar-arrow">
+    <Setter Property="Width" Value="14" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="0,3,3,0" />
+  </Style>
+  <Style Selector="Button.toolbar c|LucideIcon">
+    <Setter Property="Foreground" Value="{DynamicResource Color.Icon.Default}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.toolbar:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.toolbar-arrow:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Color.Toolbtn.BgHover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Toolbtn.BorderHover}" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Toolbar}" />
+  </Style>
+  <Style Selector="Button.toolbar:pressed /template/ ContentPresenter#PART_ContentPresenter, Button.toolbar-arrow:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Color.Toolbtn.BgPressed}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Toolbtn.BorderPressed}" />
+    <Setter Property="Opacity" Value="0.9" />
+  </Style>
+  <Style Selector="Button.toolbar:disabled, Button.toolbar-arrow:disabled">
+    <Setter Property="Opacity" Value="0.6" />
+  </Style>
+  <Style Selector="Button.toolbar:disabled /template/ ContentPresenter#PART_ContentPresenter, Button.toolbar-arrow:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Toolbar}" />
+  </Style>
+  <Style Selector="TextBlock.caption">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Margin" Value="4,-3,4,2" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+
+  <!-- Badges on Pull and Push -->
+  <Style Selector="Border.badge">
+    <Setter Property="Height" Value="12" />
+    <Setter Property="MinWidth" Value="12" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="4,0,4,1" />
+    <Setter Property="Background" Value="{DynamicResource Color.Toolbar.BadgeBg}" />
+  </Style>
+  <Style Selector="Border.badge > TextBlock">
+    <Setter Property="FontSize" Value="8" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- icon-only button -->
+  <Style Selector="Button.icon">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Icon.Default}" />
+  </Style>
+  <Style Selector="Button.icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Color.Toolbtn.BgHover}" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Icon.Default}" />
+  </Style>
+  <Style Selector="Button.icon:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Color.Toolbtn.BgPressed}" />
+  </Style>
+
+  <!-- tab close button -->
+  <Style Selector="Button.tabclose">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="3" />
+    <Setter Property="Margin" Value="0,0,2,0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tabclose.Fg}" />
+  </Style>
+  <Style Selector="Button.tabclose:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Color.Tabclose.BgHover}" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tabclose.FgHover}" />
+  </Style>
+  <Style Selector="Button.tabclose:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Color.Tabclose.BgPressed}" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tabclose.FgPressed}" />
+  </Style>
+
+  <!-- text boxes -->
+  <Style Selector="TextBox">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="Padding" Value="4,2" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="TextBox.filter">
+    <Setter Property="Height" Value="22" />
+    <Setter Property="MinHeight" Value="22" />
+    <Setter Property="Padding" Value="2,1" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Background" Value="{DynamicResource Color.FilterPanel.Bg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.FilterPanel.Border}" />
+  </Style>
+  <Style Selector="TextBox.filter:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="{DynamicResource Color.FilterPanel.Bg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.FilterPanel.Border}" />
+  </Style>
+  <Style Selector="TextBox.filter:focus /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="{DynamicResource Color.Input.Bg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Default}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!-- texts -->
+  <Style Selector="TextBlock.description, SelectableTextBlock.description">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.DialogDescription}" />
+  </Style>
+  <Style Selector="TextBlock.empty-title">
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Muted}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.empty-text">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Muted}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+
+  <!-- splitters: 5 px hit area overlapping the neighbours by 2 px, 1 px visible line -->
+  <Style Selector="GridSplitter.h, GridSplitter.v">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="Transparent">
+          <Border Name="line" Background="{DynamicResource Color.Border.Default}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="GridSplitter.h">
+    <Setter Property="Height" Value="5" />
+    <Setter Property="MinHeight" Value="5" />
+    <Setter Property="Margin" Value="0,-2" />
+    <Setter Property="ResizeDirection" Value="Rows" />
+  </Style>
+  <Style Selector="GridSplitter.h /template/ Border#line">
+    <Setter Property="Height" Value="1" />
+  </Style>
+  <Style Selector="GridSplitter.v">
+    <Setter Property="Width" Value="5" />
+    <Setter Property="MinWidth" Value="5" />
+    <Setter Property="Margin" Value="-2,0" />
+    <Setter Property="ResizeDirection" Value="Columns" />
+  </Style>
+  <Style Selector="GridSplitter.v /template/ Border#line">
+    <Setter Property="Width" Value="1" />
+  </Style>
+
+  <!-- menus -->
+  <Style Selector="Menu">
+    <Setter Property="Background" Value="{DynamicResource Color.Window.TitlebarBg}" />
+  </Style>
+  <Style Selector="Menu > MenuItem">
+    <Setter Property="Height" Value="26" />
+    <Setter Property="Padding" Value="5,0" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.MainMenu}" />
+  </Style>
+  <Style Selector="MenuItem">
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+  <Style Selector="MenuFlyoutPresenter, ContextMenu">
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="2" />
+  </Style>
+
+  <!-- repository tab strip -->
+  <Style Selector="ListBox.tabs">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="ListBox.tabs > ListBoxItem">
+    <Setter Property="Height" Value="24" />
+    <Setter Property="Padding" Value="2,0" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tab.Fg}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="bd" Background="{DynamicResource Color.Repotab.Bg}" BorderBrush="Transparent"
+                BorderThickness="1,1,1,0" CornerRadius="4,4,0,0">
+          <ContentPresenter Name="content" Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="ListBox.tabs > ListBoxItem:pointerover /template/ Border#bd">
+    <Setter Property="Background" Value="{DynamicResource Color.Repotab.BgHover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Repotab.BorderHover}" />
+  </Style>
+  <Style Selector="ListBox.tabs > ListBoxItem:selected">
+    <Setter Property="ZIndex" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tab.FgSelected}" />
+  </Style>
+  <Style Selector="ListBox.tabs > ListBoxItem:selected /template/ Border#bd">
+    <Setter Property="Background" Value="{DynamicResource Color.Repotab.BgSelected}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Repotab.BorderSelected}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource Color.Repotab.Shadow}" />
+  </Style>
+</Styles>

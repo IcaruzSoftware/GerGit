@@ -1,0 +1,114 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GerGit.ViewModels"
+        xmlns:v="using:GerGit.Views"
+        xmlns:c="using:GerGit.Controls"
+        x:Class="GerGit.Views.FileHistoryWindow"
+        x:DataType="vm:FileHistoryViewModel"
+        Title="{Binding Title}" CanResize="True" MinWidth="500" MinHeight="300"
+        Background="{DynamicResource Color.Dialog.Bg}">
+  <Window.Styles>
+    <Style Selector="ListBox#HistoryList">
+      <Setter Property="Background" Value="{DynamicResource Color.List.Bg}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox#HistoryList > ListBoxItem">
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Muted}" />
+    </Style>
+  </Window.Styles>
+  <!-- File History window: top row, timeline, history list | diff viewer. -->
+  <Grid RowDefinitions="Auto,Auto,*" Margin="20,2,20,20">
+    <DockPanel Margin="0,4,0,6">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+        <c:BusySpinner Width="14" Height="14" VerticalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}"
+                       IsVisible="{Binding IsLoading}" />
+        <!-- Limitation: a plain pill in the first label colour, not the commit list's drawn label. -->
+        <Border Name="TipLabel" IsVisible="{Binding HasTip}" CornerRadius="3" BorderThickness="1" Padding="5,0" Height="18"
+                BorderBrush="{DynamicResource Color.RefLabel.Border.0}" Background="{DynamicResource Color.RefLabel.Fill.0}">
+          <TextBlock FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource Color.Text.RefLabel}" Text="{Binding TipName}" />
+        </Border>
+      </StackPanel>
+      <TextBlock DockPanel.Dock="Left" Text="History" FontSize="16" FontWeight="Medium" VerticalAlignment="Center" />
+      <c:LucideIcon DockPanel.Dock="Left" Icon="{Binding Icon}" Size="14" Margin="8,0,4,0" VerticalAlignment="Center" />
+      <TextBlock Text="{Binding Path}" FontSize="14" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                 ToolTip.Tip="{Binding Path}" />
+    </DockPanel>
+
+    <Border Grid.Row="1" Height="46" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}" Margin="0,0,0,6">
+      <c:Timeline Name="TimelineStrip" Dates="{Binding Dates}" Selected="{Binding SelectedDates}" />
+    </Border>
+
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="280" MinWidth="150" />
+        <ColumnDefinition Width="1" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Panel Grid.Column="0">
+        <ListBox Name="HistoryList" ItemsSource="{Binding Rows}" Selection="{Binding Selection}"
+                 SelectionMode="{Binding SelectionMode}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:HistoryRow">
+              <Panel>
+                <!-- File mode: 57 px, author / date / SHA, subject, status + path; thin border below. -->
+                <Border IsVisible="{Binding IsRevision}" Height="57" Padding="8,4" BorderThickness="0,0,0,1"
+                        BorderBrush="{DynamicResource Color.Border.Default}">
+                  <StackPanel Spacing="1">
+                    <DockPanel>
+                      <TextBlock DockPanel.Dock="Right" Classes="muted" FontSize="12" Margin="6,0,0,0" Text="{Binding Revision.Sha7}" />
+                      <TextBlock DockPanel.Dock="Right" Classes="muted" FontSize="12" Margin="6,0,0,0" Text="{Binding Revision.Date}"
+                                 ToolTip.Tip="{Binding Revision.DateTip}" />
+                      <c:AvatarView DockPanel.Dock="Left" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"
+                                    AuthorName="{Binding Revision.AuthorName}" Email="{Binding Revision.AuthorEmail}" />
+                      <TextBlock FontSize="12" TextTrimming="CharacterEllipsis" Text="{Binding Revision.AuthorName}" />
+                    </DockPanel>
+                    <TextBlock FontSize="13" TextTrimming="CharacterEllipsis" Text="{Binding Revision.Subject}"
+                               ToolTip.Tip="{Binding Revision.Subject}" />
+                    <DockPanel>
+                      <c:StatusIcon DockPanel.Dock="Left" Kind="{Binding FileKind}" Width="14" Height="14" Margin="0,0,6,0" />
+                      <TextBlock FontSize="12" Classes="muted" TextTrimming="CharacterEllipsis" Text="{Binding FilePath}"
+                                 ToolTip.Tip="{Binding FilePath}" />
+                    </DockPanel>
+                  </StackPanel>
+                </Border>
+                <!-- Folder mode: 18 px commit row, then its files indented 10 px. -->
+                <DockPanel IsVisible="{Binding IsCommit}" Height="18" Margin="4,0">
+                  <TextBlock DockPanel.Dock="Right" Classes="muted" FontSize="12" Margin="6,0,0,0" Text="{Binding Revision.Date}"
+                             ToolTip.Tip="{Binding Revision.DateTip}" />
+                  <c:AvatarView DockPanel.Dock="Left" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"
+                                AuthorName="{Binding Revision.AuthorName}" Email="{Binding Revision.AuthorEmail}" />
+                  <TextBlock FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis" Text="{Binding Revision.Subject}" />
+                </DockPanel>
+                <DockPanel IsVisible="{Binding IsFile}" Height="18" Margin="14,0,4,0">
+                  <c:StatusIcon DockPanel.Dock="Left" Kind="{Binding FileKind}" Width="12" Height="12" Margin="0,0,4,0" />
+                  <c:LucideIcon DockPanel.Dock="Left" Icon="file" Size="12" Margin="0,0,4,0" VerticalAlignment="Center" />
+                  <TextBlock FontSize="12" TextTrimming="CharacterEllipsis" Text="{Binding FilePath}" ToolTip.Tip="{Binding FilePath}" />
+                </DockPanel>
+              </Panel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock Classes="empty-title" Text="Loading..." VerticalAlignment="Center" IsVisible="{Binding IsLoading}" />
+      </Panel>
+      <GridSplitter Grid.Column="1" Classes="v" />
+      <Panel Grid.Column="2">
+        <Panel IsVisible="{Binding !HasOverlay}">
+          <v:DiffView Name="DiffPane" DataContext="{Binding Diff}" />
+        </Panel>
+        <ScrollViewer IsVisible="{Binding HasOverlay}">
+          <StackPanel Classes="fallback">
+            <c:LucideIcon Icon="file-question" Size="100" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+            <TextBlock Classes="empty-title" Text="{Binding OverlayTitle}" />
+            <SelectableTextBlock Classes="empty-text" TextWrapping="Wrap" Text="{Binding OverlayText}" />
+          </StackPanel>
+        </ScrollViewer>
+      </Panel>
+    </Grid>
+  </Grid>
+</Window>

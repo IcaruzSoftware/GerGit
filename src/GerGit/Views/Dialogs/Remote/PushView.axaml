@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:core="using:GerGit.Core"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.PushView"
+             x:DataType="vm:PushViewModel"
+             c:RefView.HostOf="{Binding HostOf}">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+    <!-- Separators in the target list cannot be selected. -->
+    <Style Selector="ComboBox#Target ComboBoxItem" x:DataType="vm:PushTarget">
+      <Setter Property="IsEnabled" Value="{Binding IsSelectable}" />
+    </Style>
+  </UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Branch:" />
+    <ComboBox Name="Local" Grid.Column="1" ItemsSource="{Binding LocalBranches}" SelectedItem="{Binding SelectedLocal}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="core:GitRef"><c:RefView Icon="git-branch" Text="{Binding ShortName}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock Classes="label" Grid.Row="1" Text="Remote:" IsVisible="{Binding ShowRemote}" />
+    <ComboBox Name="Remote" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Remotes}" SelectedItem="{Binding SelectedRemote}"
+              IsVisible="{Binding ShowRemote}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="x:String"><c:RefView Remote="{Binding}" Text="{Binding}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock Classes="label" Grid.Row="2" Text="To:" />
+    <ComboBox Name="Target" Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Targets}" SelectedItem="{Binding SelectedTarget}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:PushTarget">
+          <Panel>
+            <Separator IsVisible="{Binding IsSeparator}" Margin="0" />
+            <c:RefView Icon="{Binding Icon}" Text="{Binding Text}" IsVisible="{Binding IsSelectable}" />
+          </Panel>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <CheckBox Name="Tracking" Grid.Row="3" Grid.Column="1" Content="Create _tracking reference" ToolTip.Tip="-u&#x9;Alt+T"
+              IsChecked="{Binding CreateTracking}" IsVisible="{Binding ShowTracking}" />
+    <CheckBox Name="Tags" Grid.Row="4" Grid.Column="1" Content="Push all ta_gs" ToolTip.Tip="--tags&#x9;Alt+G"
+              IsChecked="{Binding PushTags}" />
+    <c:LucideIcon Name="ForceWarning" Grid.Row="5" Icon="triangle-alert" Size="16" HorizontalAlignment="Right"
+                  VerticalAlignment="Center" Foreground="{DynamicResource Color.Status.Warning}"
+                  ToolTip.Tip="{x:Static vm:PushViewModel.ForceTip}" IsVisible="{Binding Force}" />
+    <CheckBox Name="Force" Grid.Row="5" Grid.Column="1" Content="_Force push" ToolTip.Tip="--force-with-lease &#x9;Alt+F"
+              IsChecked="{Binding Force}" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.ApplyStashView"
+             x:DataType="vm:ApplyStashViewModel">
+  <!-- Apply Stash. -->
+  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+    <TextBlock FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" Text="Stash to Apply:" />
+    <c:RefView Grid.Column="1" Icon="archive" Text="{Binding Stash.Name}" Detail="{Binding Stash.ShortSubject}" />
+    <c:LucideIcon Name="PopWarning" Grid.Row="1" Icon="triangle-alert" Size="14" Margin="0,8,6,0" HorizontalAlignment="Right"
+                  VerticalAlignment="Center" Foreground="{DynamicResource Color.Status.Warning}" IsVisible="{Binding DeleteAfterApply}" />
+    <CheckBox Name="DeleteBox" Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Content="Delete stash after applying" ToolTip.Tip="pop"
+              IsChecked="{Binding DeleteAfterApply}" />
+    <TextBlock Grid.Row="2" Grid.Column="1" FontSize="12" Margin="28,2,0,0" Foreground="{DynamicResource Color.Text.Link}" Text="Stash will not be deleted if a conflict occurs" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,2 @@
+# The vendored NuGet component (nuget/) holds only upstream .nupkg files; never diff them into the debian tarball.
+extend-diff-ignore = "^nuget/"

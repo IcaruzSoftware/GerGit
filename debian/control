@@ -1,0 +1,45 @@
+Source: gergit
+Section: vcs
+Priority: optional
+Maintainer: Gerrit Visser <developericaruz@gmail.com>
+Build-Depends: debhelper-compat (= 13), dotnet-sdk-10.0, libfontconfig1
+Standards-Version: 4.7.3
+Homepage: https://github.com/IcaruzSoftware/GerGit
+Rules-Requires-Root: no
+
+Package: gergit
+Architecture: amd64
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         git (>= 1:2.38),
+         libfontconfig1,
+         libglib2.0-0t64,
+         libice6,
+         libicu78,
+         libsecret-1-0,
+         libsm6,
+         libx11-6,
+         libxcursor1,
+         libxext6,
+         libxfixes3,
+         libxi6,
+         libxrandr2,
+Recommends: libnotify-bin, xdg-utils
+Suggests: meld | kdiff3
+Description: fast, native graphical Git client
+ GerGit is a desktop Git client for Linux, written in C# with .NET and
+ Avalonia. Every operation runs the system git command, so repositories,
+ hooks and configuration behave exactly as on the command line.
+ .
+ Features:
+  - commit graph with search; branches, remotes, tags, stashes, worktrees
+    and submodules in a sidebar; repository tabs and workspaces
+  - stage and unstage files, hunks or single lines; commit, amend, and
+    commit and push in one step, with live hook and test progress
+  - inline and side-by-side diff, image diff, blame and file history,
+    external diff and merge tools
+  - interactive rebase with drag and drop and a three-pane conflict resolver
+  - fetch, pull and push dialogs and automatic background fetch
+  - GitHub and GitLab (including self-hosted) accounts: clone from a
+    project list, pull and merge requests, notifications
+  - Quick Launch, light and dark theme following the desktop, zoom

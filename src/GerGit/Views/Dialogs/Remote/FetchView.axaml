@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.FetchView"
+             x:DataType="vm:FetchViewModel"
+             c:RefView.HostOf="{Binding HostOf}">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+  </UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+    <TextBlock Classes="label" Text="Remote:" />
+    <ComboBox Name="Remote" Grid.Column="1" ItemsSource="{Binding Remotes}" SelectedItem="{Binding SelectedRemote}"
+              IsEnabled="{Binding RemoteEnabled}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="x:String"><c:RefView Remote="{Binding}" Text="{Binding}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <CheckBox Name="AllRemotes" Grid.Row="1" Grid.Column="1" Content="Fetch all remotes" ToolTip.Tip="--all"
+              IsChecked="{Binding AllRemotes}" />
+  </Grid>
+</UserControl>

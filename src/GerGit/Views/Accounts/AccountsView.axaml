@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Accounts"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Accounts.AccountsView"
+             x:DataType="vm:AccountsViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Accounts/AccountStyles.axaml" />
+    <Style Selector="Grid#AccountGrid > TextBlock.label">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Grid#AccountGrid > TextBlock.value">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+  </UserControl.Styles>
+  <!-- Accounts window: heading, 220 px list with a +/− strip, details pane. -->
+  <Grid RowDefinitions="Auto,*">
+    <TextBlock Text="Accounts" FontSize="15" FontWeight="Medium" Margin="4,0,0,4" />
+    <Grid Grid.Row="1" ColumnDefinitions="220,*">
+      <DockPanel>
+        <Border DockPanel.Dock="Bottom" Height="23" BorderThickness="1" BorderBrush="{DynamicResource Color.List.Border}">
+          <StackPanel Orientation="Horizontal">
+            <!-- No tooltips for + and −. -->
+            <Button Name="AddButton" Classes="icon" Width="22" ToolTip.Tip="Add Account" Command="{Binding AddCommand}">
+              <c:LucideIcon Icon="plus" Size="16" />
+            </Button>
+            <Button Name="LogOutButton" Classes="icon" Width="22" ToolTip.Tip="Log Out" Command="{Binding LogOutCommand}"
+                    IsEnabled="{Binding HasSelection}">
+              <c:LucideIcon Icon="minus" Size="16" />
+            </Button>
+          </StackPanel>
+        </Border>
+        <ListBox Name="AccountList" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" BorderThickness="1,1,1,0"
+                 BorderBrush="{DynamicResource Color.List.Border}" Background="{DynamicResource Color.List.Bg}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:AccountItem">
+              <Grid ColumnDefinitions="30,*" RowDefinitions="Auto,Auto" Margin="4">
+                <c:HostIcon Grid.RowSpan="2" Type="{Binding Type}" Size="24" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Username}" FontSize="13" TextTrimming="CharacterEllipsis"
+                           Foreground="{DynamicResource Color.Text.Secondary}" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <Border Grid.Column="1" BorderThickness="0,1,1,1" BorderBrush="{DynamicResource Color.List.Border}">
+        <Panel>
+          <DockPanel Name="Details" IsVisible="{Binding HasSelection}">
+            <!-- Header: two rows of 26 px, left column 62 px with the 32 px avatar. -->
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="62,*" RowDefinitions="26,26" Margin="0,6,0,0">
+              <!-- By URL: the account picture, nothing while loading, on failure or without a URL. -->
+              <c:AvatarView Name="Avatar" Grid.RowSpan="2" Width="32" Height="32" Margin="20,0,8,0" VerticalAlignment="Center"
+                            Url="{Binding Selected.Account.AvatarUrl, FallbackValue={x:Null}}" />
+              <TextBlock Name="HeaderUser" Grid.Column="1" Text="{Binding Selected.Username, FallbackValue=''}" FontSize="13"
+                         VerticalAlignment="Center" />
+              <Button Name="ServerLink" Grid.Column="1" Grid.Row="1" Classes="link" HorizontalAlignment="Left" VerticalAlignment="Center"
+                      Content="{Binding Selected.Account.ServerUrl, FallbackValue=''}" Command="{Binding OpenServerCommand}" />
+            </Grid>
+            <Separator DockPanel.Dock="Top" Margin="0,6,0,0" />
+            <!-- The account repository list is in the Clone dialog. -->
+            <TabControl Name="Tabs" Padding="0">
+              <TabItem Header="Account" FontSize="13">
+                <!-- Tab Account: 150 px right-aligned labels, 12 px gap, 24 px rows, top margin 10. -->
+                <Grid Name="AccountGrid" ColumnDefinitions="150,*" RowDefinitions="24,24,24,24,28,28" ColumnSpacing="12" Margin="0,10,10,0">
+                  <TextBlock Classes="label" Text="Server Type:" />
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                    <c:HostIcon Type="{Binding Selected.Type, FallbackValue=Custom}" Size="16" />
+                    <TextBlock Name="ServerType" Text="{Binding ServerTypeText}" FontSize="13" />
+                  </StackPanel>
+                  <TextBlock Classes="label" Grid.Row="1" Text="Authentication Type:" />
+                  <TextBlock Name="AuthType" Classes="value" Grid.Row="1" Grid.Column="1" Text="{Binding AuthTypeText}" />
+                  <TextBlock Classes="label" Grid.Row="2" Text="Username:" />
+                  <TextBlock Name="Username" Classes="value" Grid.Row="2" Grid.Column="1" Text="{Binding Selected.Username, FallbackValue=''}" />
+                  <TextBlock Classes="label" Grid.Row="3" Text="Status:" />
+                  <Grid Grid.Row="3" Grid.Column="1" ColumnDefinitions="Auto,*">
+                    <Panel Margin="0,0,6,0" VerticalAlignment="Center">
+                      <c:BusySpinner Name="StatusSpinner" Width="14" Height="14" IsVisible="{Binding IsUpdating}"
+                                     Foreground="{DynamicResource Color.Text.Muted}" />
+                      <Ellipse Name="OnlineDot" Width="10" Height="10" Fill="#34C84A" IsVisible="{Binding IsOnline}" />
+                      <Ellipse Name="ErrorDot" Width="10" Height="10" Fill="#FA4B49" IsVisible="{Binding IsOffline}" />
+                    </Panel>
+                    <TextBlock Name="StatusLine" Grid.Column="1" FontSize="13" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Text="{Binding AccountStatusText}" ToolTip.Tip="{Binding AccountStatusText}" />
+                  </Grid>
+                  <Button Name="UpdateTokenButton" Grid.Row="4" Grid.Column="1" Height="20" Padding="4,0" MinHeight="0"
+                          VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="13"
+                          Content="Update token..." Command="{Binding UpdateTokenCommand}" />
+                  <CheckBox Name="NotificationsBox" Grid.Row="5" Grid.Column="1" FontSize="13" VerticalAlignment="Center"
+                            Content="Enable Notifications" IsChecked="{Binding NotificationsEnabled}" />
+                </Grid>
+              </TabItem>
+            </TabControl>
+          </DockPanel>
+          <StackPanel Name="Empty" VerticalAlignment="Center" Spacing="6" IsVisible="{Binding !HasSelection}">
+            <TextBlock Classes="empty-title" Text="{x:Static vm:AccountsViewModel.EmptyTitle}" />
+            <TextBlock Classes="empty-text" FontSize="13" Text="{x:Static vm:AccountsViewModel.EmptyText}" />
+          </StackPanel>
+        </Panel>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

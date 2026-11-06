@@ -1,0 +1,24 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GerGit.App">
+  <!-- The theme (RequestedThemeVariant) is set by Views/AppTheme.cs at start. -->
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://GerGit/Themes/Colors.axaml" />
+        <ResourceInclude Source="avares://GerGit/Assets/Icons.axaml" />
+        <ResourceInclude Source="avares://GerGit/Assets/BrandIcons.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://GerGit/Themes/Styles.axaml" />
+    <StyleInclude Source="avares://GerGit/Themes/Details.axaml" />
+    <StyleInclude Source="avares://GerGit/Themes/Zoom.axaml" />
+    <!-- App icon on every window (main, dialogs, Blame, File History...); :is matches Window subclasses. -->
+    <Style Selector=":is(Window)">
+      <Setter Property="Icon" Value="/Assets/gergit.png" />
+    </Style>
+  </Application.Styles>
+</Application>

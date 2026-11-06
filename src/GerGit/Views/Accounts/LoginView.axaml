@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Accounts"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Accounts.LoginView"
+             x:DataType="vm:LoginViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Accounts/AccountStyles.axaml" />
+    <Style Selector="Grid.form > TextBox">
+      <Setter Property="Padding" Value="4,2,4,2" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+  </UserControl.Styles>
+  <!-- Login windows (common): 24 px brand icon + heading 16 pt, separator, 95 px label column. -->
+  <StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="6,0,4,0" Spacing="6">
+      <c:HostIcon Type="{Binding Type}" Size="24" VerticalAlignment="Center" />
+      <TextBlock Name="Heading" Text="{Binding Header}" FontSize="16" VerticalAlignment="Center" />
+    </StackPanel>
+    <Separator Margin="0,8,0,8" />
+    <Grid Classes="form" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" MinWidth="95" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <ComboBox Name="Method" Grid.Column="1" ItemsSource="{Binding Methods}" SelectedIndex="{Binding MethodIndex}"
+                IsVisible="{Binding IsGitHub}" IsEnabled="{Binding IsEditable}" />
+
+      <TextBlock Classes="label" Grid.Row="1" Text="Server:" IsVisible="{Binding ShowServer}" />
+      <TextBox Name="ServerBox" Grid.Row="1" Grid.Column="1" PlaceholderText="https://gitlab.com" Text="{Binding Server}"
+               IsVisible="{Binding ShowServer}" IsEnabled="{Binding IsEditable}" />
+      <!-- A server URL with plain http: the token would travel unencrypted (still allowed for internal setups). -->
+      <StackPanel Name="HttpWarning" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,2,0,2"
+                  IsVisible="{Binding ShowHttpWarning}">
+        <c:LucideIcon Icon="triangle-alert" Size="14" VerticalAlignment="Center" Foreground="{DynamicResource Color.Status.Warning}" />
+        <TextBlock Text="{x:Static vm:LoginViewModel.PlainHttpWarning}" FontSize="12" VerticalAlignment="Center" />
+      </StackPanel>
+      <!-- Optional extra CA for the API calls of a GitLab Server. -->
+      <TextBlock Classes="label" Grid.Row="3" Text="CA File:" IsVisible="{Binding ShowServer}" />
+      <Grid Grid.Row="3" Grid.Column="1" ColumnDefinitions="*,Auto" IsVisible="{Binding ShowServer}">
+        <TextBox Name="CaFileBox" PlaceholderText="Optional" Padding="4,2,4,2" FontSize="13" Text="{Binding CaFile}"
+                 IsEnabled="{Binding IsEditable}" />
+        <Button Name="BrowseButton" Grid.Column="1" Margin="4,0,0,0" Content="Browse..." Click="OnBrowse"
+                IsEnabled="{Binding IsEditable}" />
+      </Grid>
+
+      <TextBlock Classes="label" Grid.Row="4" Text="{Binding TokenLabel}" IsVisible="{Binding ShowToken}" />
+      <TextBox Name="TokenBox" Grid.Row="4" Grid.Column="1" PasswordChar="•" PlaceholderText="{Binding TokenPlaceholder}"
+               Text="{Binding Token}" IsVisible="{Binding ShowToken}" IsEnabled="{Binding IsEditable}" />
+      <StackPanel Name="Hint" Grid.Row="5" Grid.Column="1" Orientation="Horizontal" IsVisible="{Binding ShowToken}"
+                  IsEnabled="{Binding HintEnabled}">
+        <TextBlock Text="Manage " FontSize="13" VerticalAlignment="Center" />
+        <Button Name="TokenLink" Classes="link" Content="personal access tokens" ToolTip.Tip="{Binding TokenLinkTip}"
+                Command="{Binding OpenTokenPageCommand}" />
+      </StackPanel>
+
+      <TextBlock Name="OAuthNotConfigured" Grid.Row="6" Grid.Column="1" FontSize="13" TextWrapping="Wrap"
+                 Foreground="{DynamicResource Color.Text.DialogDescription}"
+                 Text="{x:Static vm:LoginViewModel.OAuthNotConfigured}" IsVisible="{Binding ShowOAuthNotConfigured}" />
+
+      <!-- GitHub OAuth device flow: the code to enter on GitHub, selectable and with Copy. -->
+      <StackPanel Name="CodePanel" Grid.Row="7" Grid.Column="1" Spacing="4" Margin="0,4,0,0" IsVisible="{Binding HasUserCode}">
+        <TextBlock Text="Enter this code on GitHub:" FontSize="13" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <SelectableTextBlock Name="UserCode" Text="{Binding UserCode}" FontSize="24" FontWeight="Medium" VerticalAlignment="Center" />
+          <Button Name="CopyButton" Content="Copy" VerticalAlignment="Center" Click="OnCopyCode" />
+        </StackPanel>
+        <Button Name="VerificationLink" Classes="link" Content="{Binding VerificationUri}" Command="{Binding OpenVerificationPageCommand}" />
+      </StackPanel>
+    </Grid>
+  </StackPanel>
+</UserControl>

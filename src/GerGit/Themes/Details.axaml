@@ -1,0 +1,180 @@
+<!--
+  Styles of the details pane and the diff viewer. Colours from Colors.axaml, always DynamicResource.
+  Also pulls in the AvaloniaEdit control theme used by the diff editor.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:GerGit.Controls">
+  <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+
+  <!-- Tab bar: 30 px, panel background, Medium tab texts. -->
+  <Style Selector="Border.details-tabbar">
+    <Setter Property="Background" Value="{DynamicResource Color.Surface.Panel}" />
+  </Style>
+  <Style Selector="TabStrip.details > TabStripItem">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="MinHeight" Value="30" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tab.Fg}" />
+  </Style>
+  <Style Selector="TabStrip.details > TabStripItem:selected">
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tab.FgSelected}" />
+  </Style>
+  <Style Selector="TabStrip.details > TabStripItem:disabled">
+    <Setter Property="Foreground" Value="{DynamicResource Color.Tab.FgDisabled}" />
+  </Style>
+
+  <!-- Compact header -->
+  <Style Selector="Border.details-header">
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Default}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+  </Style>
+  <Style Selector="TextBlock.header-author">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.header-date">
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.header-subject">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.sha-badge">
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Padding" Value="3,0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <!-- Subtle background for the single-commit header. -->
+    <Setter Property="Background" Value="{DynamicResource Color.Surface.Panel}" />
+  </Style>
+  <Style Selector="Border.sha-badge > TextBlock">
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Mono}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="ContentControl.source Border.sha-badge">
+    <Setter Property="Background" Value="{DynamicResource Color.Diff.RemovedBgUi}" />
+  </Style>
+  <Style Selector="ContentControl.destination Border.sha-badge">
+    <Setter Property="Background" Value="{DynamicResource Color.Diff.AddedBgUi}" />
+  </Style>
+
+  <!-- Tab content -->
+  <Style Selector="ScrollViewer.details-content">
+    <Setter Property="Background" Value="{DynamicResource Color.List.Bg}" />
+  </Style>
+  <Style Selector="Grid.details-content">
+    <Setter Property="Background" Value="{DynamicResource Color.List.Bg}" />
+  </Style>
+  <Style Selector="TextBlock.caption-small">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+    <Setter Property="Height" Value="25" />
+    <Setter Property="Padding" Value="0,8,0,0" />
+  </Style>
+  <Style Selector="SelectableTextBlock.person-name">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="TextBlock.muted, SelectableTextBlock.muted">
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+    <Setter Property="VerticalAlignment" Value="Bottom" />
+  </Style>
+  <Style Selector="StackPanel.person">
+    <Setter Property="Spacing" Value="4" />
+  </Style>
+  <Style Selector="Grid.facts > :is(Control)">
+    <Setter Property="Margin" Value="0,3" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.row-label">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+    <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="Margin" Value="0,3,10,3" />
+  </Style>
+  <Style Selector="Border.ref-pill">
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Ref.DetailBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Padding" Value="4,0" />
+    <Setter Property="Margin" Value="0,0,4,2" />
+  </Style>
+  <Style Selector="Button.parent">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Mono}" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="2,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Link}" />
+  </Style>
+  <Style Selector="SelectableTextBlock.subject">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="Margin" Value="20,5" />
+  </Style>
+  <Style Selector="SelectableTextBlock.description-body">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="Margin" Value="20,5" />
+  </Style>
+
+  <!-- Changes tab file list -->
+  <Style Selector="ListBox.files">
+    <Setter Property="Background" Value="{DynamicResource Color.List.Bg}" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="ListBox.files > ListBoxItem">
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="Padding" Value="8,0" />
+  </Style>
+
+  <!-- Fallback messages -->
+  <Style Selector="StackPanel.fallback">
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Spacing" Value="8" />
+    <Setter Property="Margin" Value="20" />
+  </Style>
+
+  <!-- Diff header strip: 18 px, 1 px bottom border -->
+  <Style Selector="Border.diff-header">
+    <Setter Property="Height" Value="19" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Default}" />
+    <Setter Property="Background" Value="{DynamicResource Color.Surface.HeaderStrip}" />
+  </Style>
+  <Style Selector="TextBlock.diff-path">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.diff-path Run.dir">
+    <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+  </Style>
+  <Style Selector="Button.diff, ToggleButton.diff">
+    <Setter Property="Width" Value="22" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="ToggleButton.diff">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Foreground" Value="{DynamicResource Color.Icon.Default}" />
+  </Style>
+</Styles>

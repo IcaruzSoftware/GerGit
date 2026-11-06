@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.ChecksView"
+             x:DataType="vm:ChecksViewModel"
+             IsVisible="{Binding HasHooks}">
+  <!-- The checks below the buttons (Merge dialog, commit checks window): one row per hook, its items from the terminal and pytest's summary under it, the raw output. -->
+  <UserControl.Styles>
+    <Style Selector="c|LucideIcon.state">
+      <Setter Property="Size" Value="16" />
+    </Style>
+    <Style Selector="c|LucideIcon.state.passed">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Status.Success}" />
+    </Style>
+    <Style Selector="c|LucideIcon.state.failed">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Status.Error}" />
+    </Style>
+    <Style Selector="c|LucideIcon.state.skipped">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Glyph.Default}" />
+    </Style>
+  </UserControl.Styles>
+  <UserControl.Resources>
+    <DataTemplate x:Key="StateIcon" x:DataType="vm:CheckRow">
+      <Panel Width="16" Height="16" VerticalAlignment="Center">
+        <c:BusySpinner Width="14" Height="14" IsVisible="{Binding IsRunning}" Foreground="{DynamicResource Color.Text.Muted}" />
+        <c:LucideIcon Classes="state" Icon="{Binding Icon}" Classes.passed="{Binding IsPassed}"
+                      Classes.failed="{Binding IsFailed}" Classes.skipped="{Binding IsSkipped}" />
+      </Panel>
+    </DataTemplate>
+  </UserControl.Resources>
+  <Grid RowDefinitions="*,Auto" Margin="0,12,0,0">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+      <ItemsControl Name="HookList" ItemsSource="{Binding Hooks}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:HookRow">
+            <StackPanel Margin="0,1" Spacing="2">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StateIcon}" />
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+              </StackPanel>
+              <ItemsControl ItemsSource="{Binding Items}" Margin="22,0,0,0">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:CheckRow">
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,1">
+                      <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StateIcon}" />
+                      <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="description" Margin="22,0,0,0" Text="{Binding Note}"
+                         IsVisible="{Binding Note, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+    <Expander Name="OutputExpander" Grid.Row="1" Margin="0,6,0,0" Header="Output" HorizontalAlignment="Stretch" Expanded="OnTouched">
+      <c:OutputView Name="OutputBox" Height="180" Text="{Binding Output}" />
+    </Expander>
+  </Grid>
+</UserControl>

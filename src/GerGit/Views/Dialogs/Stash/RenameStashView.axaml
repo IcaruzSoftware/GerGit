@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.RenameStashView"
+             x:DataType="vm:RenameStashViewModel">
+  <!-- Rename Stash. -->
+  <Grid ColumnDefinitions="Auto,*">
+    <TextBlock FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" Text="Message:" />
+    <TextBox Name="MessageBox" Grid.Column="1" Text="{Binding Message}" PlaceholderText="Enter new stash message" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.NotificationsPopup"
+             x:DataType="vm:NotificationsViewModel">
+  <!-- Notifications popup: 350 x 460, toolbar background, drop shadow; 26 px header; 42 px two-line rows. -->
+  <Border Width="350" Height="460" Margin="10,0,10,10" BorderThickness="1" CornerRadius="6" ClipToBounds="True"
+          BorderBrush="{DynamicResource Color.Border.Default}" Background="{DynamicResource Color.Toolbar.Bg}"
+          BoxShadow="0 2 10 0 #66000000">
+    <DockPanel>
+      <Grid DockPanel.Dock="Top" Height="26" ColumnDefinitions="26,*,26">
+        <TextBlock Grid.Column="1" Text="Notifications" FontSize="14" FontWeight="Medium" HorizontalAlignment="Center"
+                   VerticalAlignment="Center" />
+        <Button Name="RefreshButton" Grid.Column="2" Classes="icon" Width="20" Height="20" ToolTip.Tip="Refresh"
+                IsVisible="{Binding !IsUpdating}" Command="{Binding RefreshCommand}">
+          <c:LucideIcon Icon="refresh-cw" Size="14" />
+        </Button>
+        <c:BusySpinner Name="RefreshSpinner" Grid.Column="2" Width="14" Height="14" IsVisible="{Binding IsUpdating}"
+                       Foreground="{DynamicResource Color.Spinner.Color}" />
+      </Grid>
+      <ListBox Name="NotificationList" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" SelectionMode="Single"
+               Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0,0,6,0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Height" Value="42" />
+          </Style>
+        </ListBox.Styles>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:NotificationRow">
+            <Grid ColumnDefinitions="14,26,*,Auto" RowDefinitions="21,21">
+              <Ellipse Width="6" Height="6" Fill="{DynamicResource Color.Accent.Base}" IsVisible="{Binding Unread}" />
+              <c:AvatarView Grid.Column="1" Width="16" Height="16" Url="{Binding AvatarUrl}" />
+              <TextBlock Grid.Column="2" FontSize="13" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                <Run FontWeight="Medium" Text="{Binding Repository}" />
+                <Run FontSize="11" Foreground="{DynamicResource Color.Text.Secondary}" Text="{Binding TargetText}" />
+              </TextBlock>
+              <TextBlock Grid.Column="3" Text="{Binding DateText}" FontSize="11" Margin="6,0,0,0" VerticalAlignment="Center"
+                         Foreground="{DynamicResource Color.Text.Secondary}" />
+              <c:LucideIcon Grid.Row="1" Grid.Column="1" Icon="{Binding Icon}" Size="16" />
+              <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding Title}" FontSize="13"
+                         VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+  </Border>
+</UserControl>

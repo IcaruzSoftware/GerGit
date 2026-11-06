@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:v="using:GerGit.Views"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.ConflictBanner"
+             x:DataType="vm:RepoTabViewModel">
+  <!-- Conflict banner, 28 px strip, warning icon, text with ref links, Resolve / Abort. -->
+  <UserControl.Styles>
+    <Style Selector="Button.banner">
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Margin" Value="2,0" />
+      <Setter Property="Padding" Value="10,0" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.banner-link">
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Focusable" Value="False" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Link}" />
+    </Style>
+    <Style Selector="Button.banner-link:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Link}" />
+    </Style>
+    <Style Selector="ItemsControl.pieces">
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="ItemsPanel">
+        <ItemsPanelTemplate>
+          <StackPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+      </Setter>
+      <Setter Property="ItemTemplate">
+        <DataTemplate DataType="vm:BannerPiece">
+          <Panel>
+            <TextBlock Text="{Binding Text}" IsVisible="{Binding !IsLink}" VerticalAlignment="Center"
+                       FontSize="{Binding $parent[ItemsControl].FontSize}" />
+            <Button Classes="banner-link" Content="{Binding Text}" IsVisible="{Binding IsLink}" VerticalAlignment="Center"
+                    FontSize="{Binding $parent[ItemsControl].FontSize}"
+                    Command="{Binding $parent[v:ConflictBanner].((vm:RepoTabViewModel)DataContext).OpenCommitCommand}"
+                    CommandParameter="{Binding Sha}" />
+          </Panel>
+        </DataTemplate>
+      </Setter>
+    </Style>
+  </UserControl.Styles>
+
+  <Border Height="28" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Color.Border.Default}"
+          Background="{DynamicResource Color.Surface.Base}">
+    <DockPanel>
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0" VerticalAlignment="Center">
+        <Button Name="BannerResolveButton" Classes="banner" Content="Resolve" IsVisible="{Binding IsAllCommitsView}"
+                Command="{Binding ResolveCommand}" />
+        <Button Name="BannerAbortButton" Classes="banner" Content="Abort" Command="{Binding AbortCommand}"
+                IsEnabled="{Binding !LocalChanges.Busy}" />
+      </StackPanel>
+      <c:LucideIcon Icon="triangle-alert" Size="18" Margin="5,4,5,4" VerticalAlignment="Center"
+                    Foreground="{DynamicResource Color.Status.Warning}" />
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ClipToBounds="True">
+        <ItemsControl Name="BannerLeft" Classes="pieces" ItemsSource="{Binding Banner.Left}" FontSize="{Binding Banner.FontSize}" />
+        <ProgressBar Name="BannerProgress" Width="100" MinWidth="0" Height="5" MinHeight="0" Margin="8,8,0,4"
+                     IsVisible="{Binding Banner.HasProgress}" Minimum="0"
+                     Maximum="{Binding Banner.Maximum}" Value="{Binding Banner.Value}" />
+        <ItemsControl Name="BannerRight" Classes="pieces" Margin="14,4,0,4" IsVisible="{Binding Banner.HasRight}"
+                      ItemsSource="{Binding Banner.Right}" FontSize="{Binding Banner.FontSize}" />
+      </StackPanel>
+    </DockPanel>
+  </Border>
+</UserControl>

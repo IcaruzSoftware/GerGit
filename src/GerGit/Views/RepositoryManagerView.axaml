@@ -1,0 +1,261 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:v="using:GerGit.Views"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.RepositoryManagerView"
+             x:DataType="vm:RepositoryManagerViewModel"
+             Background="{DynamicResource Color.Sidebar.Bg}">
+  <!-- Repository Manager (start screen): tree column, splitter, details panel. -->
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Accounts/AccountStyles.axaml" />
+    <Style Selector="TreeView.repos TreeViewItem" x:DataType="vm:RepoNode">
+      <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <StackPanel>
+            <Border Name="PART_LayoutRoot" Height="22" Margin="2,0" Padding="2,0" CornerRadius="4" Background="Transparent">
+              <Grid Name="PART_Header" ColumnDefinitions="16,*"
+                    Margin="{TemplateBinding Level, Converter={x:Static v:SidebarView.IndentConverter}}">
+                <ToggleButton Name="PART_ExpandCollapseChevron" Classes="expander" Focusable="False"
+                              IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                              IsVisible="{Binding !IsRepository}" />
+                <ContentPresenter Name="PART_HeaderPresenter" Grid.Column="1" Content="{TemplateBinding Header}"
+                                  ContentTemplate="{TemplateBinding HeaderTemplate}" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+            <ItemsPresenter Name="PART_ItemsPresenter" IsVisible="{TemplateBinding IsExpanded}"
+                            ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </StackPanel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="TreeView.repos TreeViewItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource Color.TreeRow.BgSelectedInactive}" />
+    </Style>
+    <Style Selector="TreeView.repos:focus-within TreeViewItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource Color.TreeRow.BgSelected}" />
+    </Style>
+    <Style Selector="ToggleButton.expander">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="Transparent">
+            <c:LucideIcon Name="chevron" Icon="chevron-right" Size="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Foreground="{DynamicResource Color.Glyph.Default}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="ToggleButton.expander:checked /template/ c|LucideIcon#chevron">
+      <Setter Property="Icon" Value="chevron-down" />
+    </Style>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+    <Style Selector="Border.tile">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Tile}" />
+      <Setter Property="Background" Value="{DynamicResource Color.Surface.Tile}" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="10" />
+      <Setter Property="Margin" Value="25,0,20,10" />
+    </Style>
+    <Style Selector="TextBlock.tile-title">
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,0,8,0" />
+    </Style>
+    <Style Selector="TextBlock.value, TextBlock.muted">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.Resources>
+    <DataTemplate x:Key="SummaryRow" x:DataType="vm:RepoSummaryRow">
+      <Grid ColumnDefinitions="Auto,Auto,Auto,*" Height="22">
+        <TextBlock Classes="value" FontWeight="Medium" Text="{Binding Name}" MaxWidth="250" />
+        <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Date}" Margin="10,0" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" Margin="0,0,10,0">
+          <c:AvatarView Width="16" Height="16" VerticalAlignment="Center" AuthorName="{Binding Person}" Email="{Binding Email}" />
+          <TextBlock Classes="value" Text="{Binding Person}" />
+        </StackPanel>
+        <TextBlock Grid.Column="3" Classes="muted" Text="{Binding Subject}" />
+      </Grid>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <Grid Name="Root">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="350" MinWidth="200" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Top" Text="Repository Manager" FontSize="22" FontWeight="Medium" Margin="20,10,10,10" />
+      <Panel Name="DropArea" DragDrop.AllowDrop="True" Background="Transparent">
+        <TreeView Name="Tree" Classes="repos" FontSize="14" ItemsSource="{Binding Roots}" SelectionMode="Multiple"
+                  SelectedItems="{Binding SelectedNodes}" IsVisible="{Binding !IsEmpty}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+          <TreeView.ItemTemplate>
+            <TreeDataTemplate DataType="vm:RepoNode" ItemsSource="{Binding Children}">
+              <Grid ColumnDefinitions="Auto,*" Background="Transparent" ToolTip.Tip="{Binding ToolTip}">
+                <Panel Width="20" IsVisible="{Binding !IsSection}">
+                  <c:LucideIcon Icon="folder" Size="14" IsVisible="{Binding IsFolder}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                  <c:LucideIcon Icon="folder-git-2" Size="16" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <c:LucideIcon.IsVisible>
+                      <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="IsRepository" />
+                        <Binding Path="IsValid" />
+                      </MultiBinding>
+                    </c:LucideIcon.IsVisible>
+                  </c:LucideIcon>
+                  <c:LucideIcon Icon="triangle-alert" Size="16" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                Foreground="{DynamicResource Color.Status.Warning}" IsVisible="{Binding !IsValid}" />
+                </Panel>
+                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                           IsVisible="{Binding !IsEditing}" Classes.section="{Binding IsSection}" />
+                <TextBox Grid.Column="1" Classes="rename" Text="{Binding EditText}" IsVisible="{Binding IsEditing}" MinHeight="0"
+                         Padding="2,0" VerticalAlignment="Center" KeyDown="OnRenameKeyDown" LostFocus="OnRenameLostFocus"
+                         PropertyChanged="OnRenameBoxPropertyChanged" />
+              </Grid>
+            </TreeDataTemplate>
+          </TreeView.ItemTemplate>
+        </TreeView>
+        <StackPanel Name="EmptyState" IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+          <TextBlock Classes="empty-text" Text="Drop repository here to add" />
+          <c:LucideIcon Icon="folder-git-2" Size="128" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+        </StackPanel>
+      </Panel>
+    </DockPanel>
+
+    <GridSplitter Name="Splitter" Grid.Column="1" Classes="v" />
+
+    <Panel Grid.Column="2" Background="{DynamicResource Color.Surface.Panel}">
+      <c:LucideIcon Icon="folder-git-2" Size="96" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.3"
+                    IsVisible="{Binding Details, Converter={x:Static ObjectConverters.IsNull}}" />
+      <ScrollViewer Name="DetailsPanel" DataContext="{Binding Details}" x:DataType="vm:RepoDetails"
+                    IsVisible="{Binding $self.DataContext, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <StackPanel>
+          <StackPanel Name="NotFoundPanel" IsVisible="{Binding NotFound}" Margin="25,20,20,0" Spacing="10">
+            <TextBlock Text="Repository Not Found" FontSize="22" FontWeight="Medium" />
+            <TextBlock Text="Repository was deleted or moved. Do you want to remove the reference from GerGit?" TextWrapping="Wrap" />
+            <Button Name="RemoveMissingButton" Content="Remove" HorizontalAlignment="Left" Click="OnRemoveMissingClick" />
+          </StackPanel>
+
+          <StackPanel IsVisible="{Binding Found}">
+            <Grid ColumnDefinitions="*,Auto" Margin="25,15,20,0">
+              <TextBlock Name="DetailsName" Text="{Binding Name}" FontSize="22" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+              <Button Name="OpenButton" Grid.Column="1" Content="Open" VerticalAlignment="Center" Click="OnOpenClick" />
+            </Grid>
+            <StackPanel Orientation="Horizontal" Margin="25,2,20,10" Spacing="4">
+              <TextBlock Name="DetailsPath" Classes="muted" Text="{Binding Path}" />
+              <Button Classes="icon" Width="14" Height="14" ToolTip.Tip="Open in File Explorer" Click="OnShowInFileManagerClick">
+                <c:LucideIcon Icon="folder-open" Size="12" />
+              </Button>
+            </StackPanel>
+            <SelectableTextBlock Name="DetailsError" Text="{Binding Error}" IsVisible="{Binding HasError}" Margin="25,0,20,10"
+                                 TextWrapping="Wrap" Foreground="{DynamicResource Color.Status.Warning}" />
+
+            <Border Classes="tile" IsVisible="{Binding HasData}">
+              <Grid ColumnDefinitions="250,*">
+                <!-- Label column 124 px by default; Inter is a wide font, so it grows to fit. -->
+                <Grid RowDefinitions="22,22,22,22">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="124" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Classes="label" Text="Uncommitted Files:" />
+                  <TextBlock Name="UncommittedValue" Grid.Column="1" Classes="value" Text="{Binding Uncommitted}" />
+                  <TextBlock Grid.Row="1" Classes="label" Text="Commits:" />
+                  <TextBlock Name="CommitsValue" Grid.Row="1" Grid.Column="1" Classes="value" Text="{Binding Commits}" />
+                  <TextBlock Grid.Row="2" Classes="label" Text="Initial Commit:" />
+                  <TextBlock Grid.Row="2" Grid.Column="1" Classes="value" Text="{Binding InitialCommit}" />
+                  <TextBlock Grid.Row="3" Classes="label" Text="Last Commit:" />
+                  <TextBlock Grid.Row="3" Grid.Column="1" Classes="value" Text="{Binding LastCommit}" />
+                </Grid>
+                <StackPanel Grid.Column="1">
+                  <TextBlock Text="Remotes:" FontSize="13" FontWeight="Medium" Height="22" />
+                  <ItemsControl ItemsSource="{Binding Remotes}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:RepoRemoteRow">
+                        <StackPanel Orientation="Horizontal" Spacing="6" Height="22">
+                          <c:HostIcon Type="{Binding Type}" Size="16" VerticalAlignment="Center" />
+                          <TextBlock Classes="value" Text="{Binding Name}" />
+                          <Button Classes="link" Content="{Binding Host}" Tag="{Binding Page}" IsVisible="{Binding HasPage}"
+                                  VerticalAlignment="Center" Click="OnLinkClick" />
+                          <Button Classes="link" Content="Issues" Tag="{Binding IssuesPage}" IsVisible="{Binding HasIssues}"
+                                  Foreground="{DynamicResource Color.Text.Secondary}" VerticalAlignment="Center" Click="OnLinkClick" />
+                          <Button Classes="link" Content="Pull Requests" Tag="{Binding PullRequestsPage}" IsVisible="{Binding HasPullRequests}"
+                                  Foreground="{DynamicResource Color.Text.Secondary}" VerticalAlignment="Center" Click="OnLinkClick" />
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <!-- Only the Summary heading; the Statistics tab is not built yet. -->
+            <TextBlock Text="Summary" FontSize="13" FontWeight="Medium" Margin="25,4,0,8" IsVisible="{Binding HasData}" />
+
+            <Border Classes="tile" IsVisible="{Binding HasData}">
+              <StackPanel>
+                <TextBlock Classes="tile-title" Text="Branches" />
+                <ItemsControl Name="BranchRows" ItemsSource="{Binding Branches}" ItemTemplate="{StaticResource SummaryRow}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="tile" IsVisible="{Binding HasData}">
+              <StackPanel>
+                <TextBlock Classes="tile-title" Text="Tags" />
+                <ItemsControl Name="TagRows" ItemsSource="{Binding Tags}" ItemTemplate="{StaticResource SummaryRow}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="tile" IsVisible="{Binding HasData}">
+              <StackPanel>
+                <TextBlock Classes="tile-title" Text="Commits" />
+                <ItemsControl Name="CommitRows" ItemsSource="{Binding RecentCommits}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:RepoSummaryRow">
+                      <Grid ColumnDefinitions="*,Auto,Auto" Height="22">
+                        <TextBlock Classes="value" Text="{Binding Subject}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="10,0">
+                          <c:AvatarView Width="16" Height="16" VerticalAlignment="Center" AuthorName="{Binding Person}" Email="{Binding Email}" />
+                          <TextBlock Classes="value" Text="{Binding Person}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Classes="muted" Text="{Binding Date}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+            <Border Classes="tile" IsVisible="{Binding HasReadme}">
+              <StackPanel>
+                <TextBlock Text="README.MD" FontSize="16" FontWeight="Bold" FontFamily="{DynamicResource Font.Mono}" Margin="0,0,0,6" />
+                <TextBox Name="ReadmeBox" Text="{Binding Readme}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="400"
+                         FontFamily="{DynamicResource Font.Mono}" FontSize="12" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </StackPanel>
+      </ScrollViewer>
+    </Panel>
+  </Grid>
+
+</UserControl>

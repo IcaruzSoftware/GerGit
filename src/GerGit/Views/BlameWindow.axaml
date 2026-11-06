@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GerGit.ViewModels"
+        xmlns:v="using:GerGit.Views"
+        xmlns:c="using:GerGit.Controls"
+        x:Class="GerGit.Views.BlameWindow"
+        x:DataType="vm:BlameViewModel"
+        Title="{Binding Title}" CanResize="True" MinWidth="500" MinHeight="300"
+        Background="{DynamicResource Color.Dialog.Bg}">
+  <!-- Blame window: top row, timeline, blame column | file view. -->
+  <Grid RowDefinitions="Auto,Auto,*" Margin="20,2,20,20">
+    <DockPanel Margin="0,4,0,6">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+        <c:BusySpinner Width="14" Height="14" VerticalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}"
+                       IsVisible="{Binding IsLoading}" />
+        <Button Name="BackButton" Classes="icon" ToolTip.Tip="Go Back" Command="{Binding GoBackCommand}">
+          <c:LucideIcon Icon="chevron-left" Size="16" />
+        </Button>
+        <Button Name="ForwardButton" Classes="icon" ToolTip.Tip="Go Forward" Command="{Binding GoForwardCommand}">
+          <c:LucideIcon Icon="chevron-right" Size="16" />
+        </Button>
+        <ComboBox Name="RevisionBox" Width="490" Height="22" MinHeight="22" Padding="6,0" Focusable="False"
+                  ItemsSource="{Binding Revisions}" SelectedItem="{Binding SelectedRevision}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:RevisionItem">
+              <DockPanel Width="450">
+                <TextBlock DockPanel.Dock="Right" Margin="8,0,0,0" FontSize="13" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Color.Text.Muted}" Text="{Binding Date}" />
+                <c:AvatarView DockPanel.Dock="Left" Width="14" Height="14" Margin="0,0,6,0" VerticalAlignment="Center"
+                              AuthorName="{Binding AuthorName}" Email="{Binding AuthorEmail}" />
+                <TextBlock DockPanel.Dock="Left" Margin="0,0,6,0" FontSize="13" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Color.Text.Muted}" Text="{Binding Sha7}" />
+                <TextBlock FontSize="13" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Subject}" />
+              </DockPanel>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <TextBlock DockPanel.Dock="Left" Text="Blame" FontSize="16" FontWeight="Medium" VerticalAlignment="Center" />
+      <c:LucideIcon DockPanel.Dock="Left" Icon="file" Size="14" Margin="8,0,4,0" VerticalAlignment="Center" />
+      <TextBlock Text="{Binding Path}" FontSize="14" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                 ToolTip.Tip="{Binding Path}" />
+    </DockPanel>
+
+    <Border Grid.Row="1" Height="46" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}" Margin="0,0,0,6">
+      <c:Timeline Name="TimelineStrip" Dates="{Binding Dates}" Selected="{Binding SelectedDates}" />
+    </Border>
+
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="330" MinWidth="150" />
+        <ColumnDefinition Width="1" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Panel Grid.Column="0">
+        <c:BlameColumn Name="Column" Rows="{Binding Rows}" />
+        <TextBlock Classes="empty-title" Text="Loading..." VerticalAlignment="Center" IsVisible="{Binding ShowLoadingText}" />
+      </Panel>
+      <GridSplitter Grid.Column="1" Classes="v" />
+      <Panel Grid.Column="2">
+        <Panel IsVisible="{Binding !HasError}">
+          <v:DiffView Name="DiffPane" DataContext="{Binding Diff}" />
+        </Panel>
+        <ScrollViewer IsVisible="{Binding HasError}">
+          <StackPanel Classes="fallback">
+            <c:LucideIcon Icon="file-question" Size="100" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+            <TextBlock Classes="empty-title" Text="Error" />
+            <SelectableTextBlock Classes="empty-text" TextWrapping="Wrap" Text="{Binding ErrorText}" />
+          </StackPanel>
+        </ScrollViewer>
+      </Panel>
+    </Grid>
+  </Grid>
+</Window>

@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.PushBranchesView"
+             x:DataType="vm:PushBranchesViewModel"
+             c:RefView.HostOf="{Binding HostOf}">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+  </UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*">
+    <TextBlock Classes="label" Text="Branches:" VerticalAlignment="Top" />
+    <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}" MinHeight="100">
+      <ScrollViewer>
+        <ItemsControl Name="Rows" ItemsSource="{Binding Rows}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:PushBranchRow">
+              <StackPanel Orientation="Horizontal" Height="18" Spacing="6" Margin="4,0">
+                <c:RefView Icon="git-branch" Text="{Binding Branch}" />
+                <TextBlock Text="→" FontSize="13" VerticalAlignment="Center" />
+                <c:RefView Remote="{Binding $parent[ItemsControl].((vm:PushBranchesViewModel)DataContext).Remote}" Text="{Binding Target}" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</UserControl>

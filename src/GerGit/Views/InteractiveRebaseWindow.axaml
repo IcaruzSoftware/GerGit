@@ -1,0 +1,236 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GerGit.ViewModels"
+        xmlns:v="using:GerGit.Views"
+        xmlns:c="using:GerGit.Controls"
+        x:Class="GerGit.Views.InteractiveRebaseWindow"
+        x:DataType="vm:InteractiveRebaseViewModel"
+        Title="Interactive Rebase" ShowInTaskbar="False" CanResize="True" MinWidth="600" MinHeight="400"
+        Background="{DynamicResource Color.Dialog.Bg}">
+  <!-- Interactive rebase window: title, parameter row, todo list over the details pane, footer. -->
+  <Window.Styles>
+    <Style Selector="ListBox#TodoList">
+      <Setter Property="Background" Value="{DynamicResource Color.List.Bg}" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <!-- 22 px rows, no padding; the selection is a rounded block (corners set by the window per run of rows). -->
+    <Style Selector="ListBox#TodoList > ListBoxItem">
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="bd" Background="Transparent" CornerRadius="{TemplateBinding CornerRadius}">
+            <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="ListBox#TodoList > ListBoxItem:selected /template/ Border#bd">
+      <Setter Property="Background" Value="{DynamicResource Color.Row.BgSelected}" />
+    </Style>
+    <!-- Row text: normal, grey for squash/fixup/drop, strikethrough for drop, white when selected (wins). -->
+    <Style Selector="TextBlock.row">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+    </Style>
+    <Style Selector="TextBlock.row.muted">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Muted}" />
+    </Style>
+    <Style Selector="TextBlock.row.dropped">
+      <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+    <Style Selector="ListBoxItem:selected TextBlock.row">
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <!-- Compact (interactive rebase action) combo: no border, transparent, popup offset -8,-8. -->
+    <Style Selector="ComboBox.action">
+      <Setter Property="Width" Value="85" />
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="4,0,0,0" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Focusable" Value="False" />
+      <Setter Property="IsTabStop" Value="False" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+    </Style>
+    <Style Selector="ComboBox.action.muted">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Muted}" />
+    </Style>
+    <Style Selector="ListBoxItem:selected ComboBox.action">
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="ListBoxItem:selected ComboBox.action:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+    </Style>
+    <Style Selector="ComboBox.action:pointerover /template/ Border#Background, ComboBox.action:pressed /template/ Border#Background">
+      <Setter Property="Background" Value="{DynamicResource Color.Combo.CompactHover}" />
+    </Style>
+    <Style Selector="ComboBox.action /template/ Border#PopupBorder">
+      <Setter Property="Background" Value="{DynamicResource Color.Combo.PopupBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Combo.PopupBorder}" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+    <Style Selector="ComboBox.action /template/ Popup#PART_Popup">
+      <Setter Property="HorizontalOffset" Value="-8" />
+      <Setter Property="VerticalOffset" Value="-8" />
+    </Style>
+    <Style Selector="TextBlock.counter">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Margin" Value="0,0,8,0" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Subjectlen.Ok}" />
+    </Style>
+    <Style Selector="TextBlock.counter.warn">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Subjectlen.Warn}" />
+    </Style>
+    <Style Selector="TextBlock.counter.error">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Subjectlen.Error}" />
+    </Style>
+  </Window.Styles>
+
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto">
+    <TextBlock Name="Heading" Text="Interactive Rebase" FontSize="18" FontWeight="Medium" Margin="4,0,0,6" />
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,4">
+      <TextBlock Text="Rebase:" FontSize="13" Margin="4,0,4,4" VerticalAlignment="Center" />
+      <c:RefView Name="BranchChip" Width="300" Icon="git-branch" Text="{Binding Branch}" />
+      <TextBlock Text="On:" FontSize="13" Margin="4,0,4,4" VerticalAlignment="Center" />
+      <c:RefView Name="TargetChip" Icon="{Binding TargetIcon}" Text="{Binding TargetText}" />
+      <CheckBox Name="UpdateRefsBox" Margin="30,0,0,0" FontSize="13" Content="Update dependent branches" ToolTip.Tip="--update-refs"
+                IsChecked="{Binding UpdateRefs}" IsEnabled="{Binding IsIdle}" />
+    </StackPanel>
+
+    <Grid Grid.Row="2" Name="Body">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*" MinHeight="66" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" MinHeight="66" />
+      </Grid.RowDefinitions>
+      <ListBox Name="TodoList" ItemsSource="{Binding Items}" SelectionMode="Multiple" IsEnabled="{Binding IsIdle}"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox.Resources>
+          <SolidColorBrush x:Key="ComboBoxBackground" Color="Transparent" />
+          <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="Transparent" />
+          <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="Transparent" />
+          <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="Transparent" />
+          <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="Transparent" />
+          <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="Transparent" />
+        </ListBox.Resources>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:RebaseItem">
+            <!-- List columns: action 100 | glyph 40 | chips + subject | avatar 19 | author 120 | SHA 70 | date 120. -->
+            <Grid ColumnDefinitions="100,40,*,19,120,70,120" Height="22" Background="Transparent">
+              <ComboBox Classes="action" Classes.muted="{Binding IsMuted}" ItemsSource="{x:Static vm:ActionChoice.All}"
+                        SelectedIndex="{Binding ActionIndex, Mode=OneWay}" SelectionChanged="OnActionChosen">
+                <ComboBox.SelectionBoxItemTemplate>
+                  <DataTemplate x:DataType="vm:ActionChoice">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <Ellipse Width="12" Height="12" VerticalAlignment="Center" Fill="{Binding Dot}" />
+                      <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ComboBox.SelectionBoxItemTemplate>
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ActionChoice">
+                    <Grid Width="450" ColumnDefinitions="16,70,*,40">
+                      <Ellipse Width="12" Height="12" Margin="0,0,4,0" VerticalAlignment="Center" Fill="{Binding Dot}"
+                               IsVisible="{Binding HasDot}" />
+                      <TextBlock Grid.Column="1" FontSize="13" Text="{Binding Title}" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" FontSize="13" Margin="4,0" Text="{Binding Description}" VerticalAlignment="Center"
+                                 Foreground="{DynamicResource Color.Text.Secondary}" />
+                      <TextBlock Grid.Column="3" FontSize="13" Text="{Binding Shortcut}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <c:RebaseGlyphView Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Left" Glyph="{Binding Glyph}"
+                                 Foreground="{DynamicResource Color.Text.Muted}" />
+              <DockPanel Grid.Column="2" Margin="2,0,0,2">
+                <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Refs}" VerticalAlignment="Center">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,4,0" /></ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                      <Border CornerRadius="3" Padding="4,0" Height="18" Background="{DynamicResource Color.Lane.5}">
+                        <StackPanel Orientation="Horizontal" Spacing="3">
+                          <c:LucideIcon Icon="git-branch" Size="12" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                          <TextBlock Text="{Binding}" FontSize="12" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Name="SubjectText" Classes="row" Classes.muted="{Binding IsMuted}" Classes.dropped="{Binding IsDropped}"
+                           Text="{Binding Subject}" />
+              </DockPanel>
+              <c:AvatarView Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" AuthorName="{Binding Author}"
+                            Email="{Binding AuthorEmail}" />
+              <TextBlock Grid.Column="4" Classes="row" Classes.muted="{Binding IsMuted}" Classes.dropped="{Binding IsDropped}"
+                         Margin="2,0,0,2" Text="{Binding Author}" />
+              <TextBlock Grid.Column="5" Classes="row" Classes.muted="{Binding IsMuted}" Classes.dropped="{Binding IsDropped}"
+                         Margin="5,0,0,2" FontFamily="{DynamicResource Font.Mono}" Text="{Binding ShortSha}" />
+              <TextBlock Grid.Column="6" Classes="row" Classes.muted="{Binding IsMuted}" Classes.dropped="{Binding IsDropped}"
+                         Margin="0,0,0,2" Text="{Binding Date}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <GridSplitter Grid.Row="1" Classes="h" />
+      <v:DetailsView Name="Preview" Grid.Row="2" DataContext="{Binding Details}" />
+
+      <Border Name="LoadingCover" Grid.RowSpan="3" Background="{DynamicResource Color.Dialog.Bg}" IsVisible="{Binding IsLoading}">
+        <TextBlock Text="Loading..." FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+
+      <!-- Overlay layer of the list: the drop line and the reword popup. -->
+      <Canvas Name="Overlay" Grid.RowSpan="3">
+        <Border Name="DropLine" Height="2" Background="{DynamicResource Color.Accent.Base}" IsVisible="False" IsHitTestVisible="False" />
+        <Panel Name="RewordHost" IsVisible="{Binding Reword, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <Border Name="RewordPopup" Margin="7" Width="622" Height="166" Padding="10" CornerRadius="6" BorderThickness="1"
+                BorderBrush="{DynamicResource Color.Combo.PopupBorder}" Background="{DynamicResource Color.Menu.Bg}"
+                BoxShadow="0 1 10 0 #33000000" DataContext="{Binding Reword}">
+          <Grid x:DataType="vm:RewordViewModel" RowDefinitions="24,*,Auto">
+            <Panel>
+              <TextBox Name="RewordSubject" Height="24" MinHeight="24" FontSize="13" Padding="4,1,32,1" PlaceholderText="Commit subject"
+                       Text="{Binding Subject}" />
+              <TextBlock Name="RewordCounter" Classes="counter" Classes.warn="{Binding CounterWarn}" Classes.error="{Binding CounterError}"
+                         Text="{Binding CounterText}" IsVisible="{Binding CounterVisible}" />
+            </Panel>
+            <TextBox Name="RewordDescription" Grid.Row="1" Margin="0,4,0,0" FontSize="13" Padding="4,2,4,3" AcceptsReturn="True"
+                     TextWrapping="Wrap" PlaceholderText="Description" Text="{Binding Description}" />
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4" Margin="0,6,0,0">
+              <Button Name="RewordCancel" Content="Cancel" Padding="10,2" Click="OnRewordCancel" />
+              <Button Name="RewordOk" Content="OK" Padding="10,2" Click="OnRewordOk" />
+            </StackPanel>
+          </Grid>
+        </Border>
+        </Panel>
+      </Canvas>
+    </Grid>
+
+    <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto" Margin="0,10,0,0">
+      <CheckBox Name="BackupBox" Margin="0,2,0,0" VerticalAlignment="Center" Content="Backup current state with a temporary branch"
+                IsChecked="{Binding Backup}" IsEnabled="{Binding IsIdle}" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="4" Margin="8,0">
+        <c:BusySpinner Name="FooterSpinner" Width="14" Height="14" VerticalAlignment="Center"
+                       Foreground="{DynamicResource Color.Text.Muted}" IsVisible="{Binding ShowSpinner}" />
+        <TextBlock Name="FooterText" FontSize="13" VerticalAlignment="Center" Text="{Binding StatusText}" />
+      </StackPanel>
+      <StackPanel Grid.Column="2" Orientation="Horizontal">
+        <Button Name="CancelButton" Margin="4,0,0,0" Content="Cancel" Click="OnCancel" />
+        <Button Name="RebaseButton" Margin="4,0,0,0" Content="Rebase" IsDefault="True" IsEnabled="{Binding CanRebase}" Click="OnRebase" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

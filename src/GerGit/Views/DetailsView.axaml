@@ -1,0 +1,179 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:v="using:GerGit.Views"
+             xmlns:c="using:GerGit.Controls"
+             xmlns:core="using:GerGit.Core"
+             x:Class="GerGit.Views.DetailsView"
+             x:DataType="vm:DetailsViewModel"
+             Background="{DynamicResource Color.Surface.Base}">
+  <!-- Details pane. Commit and Changes tabs only (File Tree, Quick Look, separate window and the
+       collapse toggle come later); no header animation, file filter or tree view.
+       The commit list's search text (c:SearchHighlight.Text, set by RepoTabView; not in the rebase editor's preview)
+       is highlighted in the SHA, author, subject, description, the compact header and the changed file paths. -->
+  <UserControl.DataTemplates>
+    <!-- File row: change-type icon + path; renames "old → new". -->
+    <DataTemplate DataType="core:ChangedFile">
+      <!-- A DockPanel, not a horizontal StackPanel: the path gets the row width, so it is trimmed (and gets its tooltip). -->
+      <DockPanel Background="Transparent" ToolTip.Tip="{Binding Converter={x:Static v:DetailsView.FileToolTip}}">
+        <c:LucideIcon Size="14" Margin="0,0,6,0" VerticalAlignment="Center"
+                      Icon="{Binding Kind, Converter={x:Static v:DetailsView.KindIcon}}"
+                      Foreground="{Binding Kind, Converter={x:Static v:DetailsView.KindBrush}}" />
+        <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                   Text="{Binding Converter={x:Static v:DetailsView.FileText}}" c:SearchHighlight.IsEnabled="True"
+                   c:TrimmedToolTip.IsEnabled="{Binding Converter={x:Static v:DetailsView.IsNotRenamed}}" />
+      </DockPanel>
+    </DataTemplate>
+    <!-- One compact header row. -->
+    <DataTemplate DataType="vm:HeaderRow">
+      <StackPanel Orientation="Horizontal" Spacing="8" Height="24" Margin="10,0">
+        <c:AvatarView Width="18" Height="18" Margin="0,0,2,0" VerticalAlignment="Center" AuthorName="{Binding Author}" Email="{Binding Email}" />
+        <TextBlock Classes="header-author" Text="{Binding Author}" c:SearchHighlight.IsEnabled="True" />
+        <Border Classes="sha-badge">
+          <TextBlock Text="{Binding Sha7}" c:SearchHighlight.IsEnabled="True" />
+        </Border>
+        <TextBlock Classes="header-date" Text="{Binding Date}" />
+        <TextBlock Classes="header-subject" Text="{Binding Subject}" ToolTip.Tip="{Binding ToolTip}" c:SearchHighlight.IsEnabled="True" />
+        <TextBlock Classes="header-date" Text="↩" FontSize="12" IsVisible="{Binding IsMultiLine}" />
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <Grid RowDefinitions="30,Auto,*">
+    <!-- Tab bar -->
+    <Border Classes="details-tabbar">
+      <TabStrip Classes="details" SelectedIndex="{Binding SelectedTab}">
+        <TabStripItem Content="Commit" IsEnabled="{Binding IsCommitTabEnabled}" />
+        <TabStripItem Content="Changes" IsEnabled="{Binding IsChangesTabEnabled}" />
+      </TabStrip>
+    </Border>
+
+    <!-- Compact header: one row for a single commit on the Changes tab, two rows for a range. -->
+    <Border Grid.Row="1" Classes="details-header" IsVisible="{Binding ShowSingleHeader}">
+      <ContentControl Content="{Binding SingleHeader}" />
+    </Border>
+    <Border Grid.Row="1" Classes="details-header" IsVisible="{Binding IsRange}">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel>
+          <ContentControl Classes="source" Content="{Binding SourceHeader}" />
+          <ContentControl Classes="destination" Content="{Binding DestinationHeader}" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="icon" Width="22" Height="22" Margin="0,0,6,0" VerticalAlignment="Center"
+                ToolTip.Tip="Reverse Commits" Command="{Binding ReverseCommitsCommand}">
+          <c:LucideIcon Icon="arrow-up-down" Size="16" />
+        </Button>
+      </Grid>
+    </Border>
+
+    <!-- Commit tab -->
+    <ScrollViewer Grid.Row="2" Classes="details-content" IsVisible="{Binding IsCommitTabActive}"
+                  HorizontalScrollBarVisibility="Disabled">
+      <StackPanel IsVisible="{Binding HasCommit}" Margin="0,8,0,12">
+        <Grid ColumnDefinitions="82,*,48,*" Margin="0,0,0,4">
+          <!-- Avatars 42x42 right aligned in columns 0 and 2. -->
+          <c:AvatarView Name="AuthorAvatar" Width="42" Height="42" Margin="0,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                        AuthorName="{Binding Commit.AuthorName}" Email="{Binding Commit.AuthorEmail}" />
+          <StackPanel Grid.ColumnSpan="{Binding AuthorColumnSpan}" Grid.Column="1" Classes="person">
+            <TextBlock Classes="caption-small" Text="AUTHOR" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <SelectableTextBlock Name="AuthorNameText" Classes="person-name" Text="{Binding Commit.AuthorName}" c:SearchHighlight.IsEnabled="True" />
+              <SelectableTextBlock Name="AuthorEmailText" Classes="muted" Text="{Binding Commit.AuthorEmail}" c:SearchHighlight.IsEnabled="True" />
+            </StackPanel>
+            <TextBlock Classes="muted" Text="{Binding AuthorDateText}" />
+          </StackPanel>
+          <c:AvatarView Name="CommitterAvatar" Grid.Column="2" Width="42" Height="42" Margin="0,0,6,0" HorizontalAlignment="Right"
+                        VerticalAlignment="Center" IsVisible="{Binding ShowCommitter}"
+                        AuthorName="{Binding Commit.CommitterName}" Email="{Binding Commit.CommitterEmail}" />
+          <StackPanel Grid.Column="3" Classes="person" IsVisible="{Binding ShowCommitter}">
+            <TextBlock Classes="caption-small" Text="COMMITTER" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <SelectableTextBlock Classes="person-name" Text="{Binding Commit.CommitterName}" />
+              <SelectableTextBlock Classes="muted" Text="{Binding Commit.CommitterEmail}" />
+            </StackPanel>
+            <TextBlock Classes="muted" Text="{Binding CommitterDateText}" />
+          </StackPanel>
+        </Grid>
+
+        <Grid ColumnDefinitions="82,*" RowDefinitions="Auto,Auto,Auto" Classes="facts">
+          <TextBlock Classes="row-label" Text="REFS" IsVisible="{Binding HasRefs}" />
+          <ItemsControl Grid.Column="1" ItemsSource="{Binding CommitRefs}" IsVisible="{Binding HasRefs}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <Border Classes="ref-pill">
+                  <TextBlock Text="{Binding}" />
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <TextBlock Grid.Row="1" Classes="row-label" Text="SHA" IsVisible="{Binding !IsStash}" />
+          <SelectableTextBlock Grid.Row="1" Grid.Column="1" Name="ShaText" FontFamily="{DynamicResource Font.Mono}" c:SearchHighlight.IsEnabled="True"
+                               Text="{Binding Commit.Sha}" IsVisible="{Binding !IsStash}" />
+
+          <TextBlock Grid.Row="2" Classes="row-label" Text="PARENTS" />
+          <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Commit.Parents}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="4" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <Button Classes="parent" Content="{Binding Converter={x:Static v:DetailsView.Sha7}}"
+                        Command="{Binding $parent[v:DetailsView].((vm:DetailsViewModel)DataContext).SelectParentCommand}"
+                        CommandParameter="{Binding}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </Grid>
+
+        <Separator Margin="20,10,20,5" />
+        <!-- Message text with issue tracker links and URLs, set by the code-behind. -->
+        <SelectableTextBlock Name="SubjectText" Classes="subject" c:SearchHighlight.IsEnabled="True" />
+        <SelectableTextBlock Name="DescriptionText" Classes="description-body" c:SearchHighlight.IsEnabled="True"
+                             IsVisible="{Binding HasDescription}" />
+        <Separator Margin="20,10,20,5" />
+
+        <!-- Not built yet: rows do not expand to an inline diff yet; the Changes tab shows the diffs. -->
+        <ItemsControl Name="CommitFiles" ItemsSource="{Binding CommitTabFiles}" Margin="20,0">
+          <ItemsControl.ItemContainerTheme>
+            <ControlTheme TargetType="ContentPresenter">
+              <Setter Property="Height" Value="24" />
+            </ControlTheme>
+          </ItemsControl.ItemContainerTheme>
+        </ItemsControl>
+        <TextBlock Classes="muted" HorizontalAlignment="Center" Margin="0,8" Text="{Binding FileLimitNote}"
+                   IsVisible="{Binding HasFileLimitNote}" />
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Changes tab: file list | splitter | diff viewer -->
+    <Grid Grid.Row="2" Classes="details-content" IsVisible="{Binding IsChangesTabActive}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="280" MinWidth="220" MaxWidth="850" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <!-- Multi-selection for the file menu; the diff shows the first selected file. -->
+      <ListBox Name="FileList" Classes="files" SelectionMode="Multiple" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile}" />
+      <v:DiffView Name="Diff" Grid.Column="2" DataContext="{Binding Diff}" />
+      <GridSplitter Grid.Column="1" Classes="v" />
+    </Grid>
+
+    <!-- Overlay for fallback messages over header and content. -->
+    <Border Grid.Row="1" Grid.RowSpan="2" IsVisible="{Binding HasOverlay}" Background="{DynamicResource Color.Surface.EmptyState}">
+      <ScrollViewer>
+        <StackPanel Classes="fallback">
+          <c:LucideIcon Icon="file-question" Size="100" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+          <TextBlock Name="OverlayTitle" Classes="empty-title" Text="{Binding OverlayTitle}" />
+          <SelectableTextBlock Name="OverlayText" Classes="empty-text" TextWrapping="Wrap" Text="{Binding OverlayText}" />
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</UserControl>

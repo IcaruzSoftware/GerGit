@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GerGit.ViewModels.Dialogs"
+        xmlns:c="using:GerGit.Controls"
+        x:Class="GerGit.Views.Dialogs.DialogWindow"
+        x:DataType="vm:DialogViewModel"
+        Title="{Binding Title}" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Color.Dialog.Bg}">
+  <!-- Standard dialog frame: 80 px logo column, header, body, footer. -->
+  <Grid Name="Frame" Margin="20,12,20,20" ColumnDefinitions="80,*" RowDefinitions="Auto,*,Auto,Auto">
+    <!-- No logo asset: the accent-coloured git-branch icon stands in for the 64 px app logo. -->
+    <Panel Name="Logo" Grid.RowSpan="2" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top">
+      <c:LucideIcon Icon="git-branch" Size="64" Foreground="{DynamicResource Color.Accent.Base}" />
+      <c:LucideIcon Name="Badge" Icon="triangle-alert" Size="24" Margin="38,38,0,0" IsVisible="{Binding WarningBadge}"
+                    Foreground="{DynamicResource Color.Status.Warning}" />
+    </Panel>
+    <StackPanel Name="Header" Grid.Column="1">
+      <TextBlock Name="DialogTitle" Text="{Binding Title}" FontSize="15" FontWeight="Medium" TextWrapping="Wrap"
+                 Foreground="{DynamicResource Color.Text.Primary}" />
+      <TextBlock Name="DialogDescription" Classes="description" Text="{Binding Description}" TextWrapping="Wrap"
+                 Margin="0,2,0,0" IsVisible="{Binding HasDescription}" />
+    </StackPanel>
+    <ContentControl Name="Body" Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" IsEnabled="{Binding BodyEnabled}" />
+
+    <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,10,0,0" ColumnDefinitions="Auto,Auto,*,Auto">
+      <c:BusySpinner Name="FooterSpinner" Width="14" Height="14" Margin="0,0,4,0" VerticalAlignment="Center"
+                 Foreground="{DynamicResource Color.Text.Muted}" IsVisible="{Binding ShowSpinner}" />
+      <c:LucideIcon Name="FooterIcon" Grid.Column="1" Size="16" Margin="0,0,4,0" VerticalAlignment="Center" Icon="{Binding StatusIcon}"
+                    IsVisible="{Binding StatusIcon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+      <TextBlock Name="FooterText" Grid.Column="2" FontSize="13" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                 Text="{Binding StatusText}" ToolTip.Tip="{Binding StatusText}" />
+      <StackPanel Grid.Column="3" Orientation="Horizontal">
+        <Button Name="SecondaryButton" Margin="4,0,0,0" Content="{Binding SecondaryText}" IsEnabled="{Binding SubmitEnabled}"
+                IsVisible="{Binding SecondaryText, Converter={x:Static ObjectConverters.IsNotNull}}" Click="OnSecondary" />
+        <Button Name="SubmitButton" Margin="4,0,4,0" Content="{Binding SubmitText}" IsEnabled="{Binding SubmitEnabled}"
+                IsVisible="{Binding SubmitText, Converter={x:Static ObjectConverters.IsNotNull}}" Click="OnSubmit" />
+        <Button Name="CancelButton" Margin="4,0,0,0" Content="{Binding CancelText}" IsCancel="True"
+                Click="OnCancel" />
+      </StackPanel>
+    </Grid>
+    <!-- DialogViewModel.Panel below the buttons (the Merge dialog's checks); enabled while busy. -->
+    <ContentControl Name="PanelHost" Grid.Row="3" Grid.ColumnSpan="2" />
+  </Grid>
+</Window>

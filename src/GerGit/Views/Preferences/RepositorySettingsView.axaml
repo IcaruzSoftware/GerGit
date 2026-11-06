@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Preferences"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Preferences.RepositorySettingsView"
+             x:DataType="vm:RepositorySettingsViewModel">
+  <!-- the Repository Settings window body, same tab control and styles as Preferences. -->
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Accounts/AccountStyles.axaml" />
+    <Style Selector="TabItem">
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="TextBlock.heading">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Margin" Value="0,8,0,2" />
+    </Style>
+    <Style Selector="TextBlock.hint">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+    </Style>
+    <Style Selector="CheckBox">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="MinHeight" Value="20" />
+    </Style>
+    <Style Selector="ListBox#RuleList > ListBoxItem">
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.List.Border}" />
+    </Style>
+  </UserControl.Styles>
+
+  <TabControl Name="Pages" Padding="0">
+    <!-- General (content width 450): the repository's own git identity. -->
+    <TabItem Header="General">
+      <StackPanel Width="450" Margin="0,10,0,0">
+        <TextBlock Classes="heading" Text="User Information" />
+        <CheckBox Name="UseGlobalIdentity" Margin="0,4,0,10" Content="Use global git credentials"
+                  IsChecked="{Binding UseGlobalIdentity}" IsEnabled="{Binding CanToggleIdentity}" />
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="4">
+          <c:AvatarView Grid.RowSpan="2" Width="42" Height="42" Margin="60,0,10,0" Email="{Binding UserEmail}"
+                        AuthorName="{Binding UserName}" />
+          <TextBox Name="UserName" Grid.Column="1" PlaceholderText="User name" Text="{Binding UserName}"
+                   IsEnabled="{Binding IdentityEditable}" />
+          <TextBox Name="UserEmail" Grid.Column="1" Grid.Row="1" PlaceholderText="Email" Text="{Binding UserEmail}"
+                   IsEnabled="{Binding IdentityEditable}" />
+        </Grid>
+        <StackPanel Orientation="Horizontal" Margin="112,4,0,0">
+          <TextBlock Text="Change the avatar at" FontSize="13" VerticalAlignment="Center" />
+          <Button Classes="link" Margin="4,0,0,0" Content="gravatar.com" Click="OnGravatar" />
+        </StackPanel>
+      </StackPanel>
+    </TabItem>
+
+    <!-- Issue Tracker (600 x 340). -->
+    <TabItem Header="Issue Tracker">
+      <Panel Width="600" Height="340" Margin="0,10,0,0">
+        <Border Background="{DynamicResource Color.Surface.EmptyState}" IsVisible="{Binding !GlobalIssueLinks}">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Classes="empty-title" Text="Issue Tracker Integration is disabled" />
+            <TextBlock Classes="empty-text" Margin="0,10,0,0" Text="Enable Issue Tracker Integration in GerGit preferences" />
+          </StackPanel>
+        </Border>
+        <DockPanel IsVisible="{Binding GlobalIssueLinks}">
+          <CheckBox Name="RepoIssueLinks" DockPanel.Dock="Top" Margin="0,0,0,10" IsChecked="{Binding RepoIssueLinks}"
+                    Content="Add hyperlinks to issue numbers in commit messages" />
+          <Panel>
+            <Border Background="{DynamicResource Color.Surface.EmptyState}" IsVisible="{Binding ShowRepoDisabled}">
+              <TextBlock Classes="empty-text" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+                         Text="{Binding RepoDisabledText}" />
+            </Border>
+            <Grid ColumnDefinitions="200,*" IsVisible="{Binding ShowRules}">
+              <!-- Rule list with its +/- bar. -->
+              <DockPanel>
+                <Border DockPanel.Dock="Bottom" Height="20" BorderThickness="1,0,1,1" BorderBrush="{DynamicResource Color.List.Border}"
+                        Background="{DynamicResource Color.Surface.Base}">
+                  <StackPanel Orientation="Horizontal">
+                    <Button Name="AddRuleButton" Classes="icon" Width="26" Height="18" ToolTip.Tip="Add" Click="OnAddRule">
+                      <StackPanel Orientation="Horizontal">
+                        <c:LucideIcon Icon="plus" Size="12" />
+                        <c:LucideIcon Icon="chevron-down" Size="8" />
+                      </StackPanel>
+                    </Button>
+                    <Button Name="RemoveRuleButton" Classes="icon" Width="18" Height="18" ToolTip.Tip="Remove"
+                            IsEnabled="{Binding HasSelectedRule}" Click="OnRemoveRule">
+                      <c:LucideIcon Icon="minus" Size="12" />
+                    </Button>
+                  </StackPanel>
+                </Border>
+                <ListBox Name="RuleList" ItemsSource="{Binding Rules}" SelectedItem="{Binding SelectedRule}"
+                         BorderThickness="1" BorderBrush="{DynamicResource Color.List.Border}" Background="{DynamicResource Color.List.Bg}">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:IssueRuleItem">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis" c:TrimmedToolTip.IsEnabled="True" />
+                        <TextBlock Classes="hint" Text="{Binding LevelText}" FontSize="12" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </DockPanel>
+
+              <!-- Editor of the selected rule; the empty-state panel when there is none. -->
+              <Border Grid.Column="1" Margin="15,0,0,0" Background="{DynamicResource Color.Surface.EmptyState}"
+                      IsVisible="{Binding !HasSelectedRule}" />
+              <ContentControl Grid.Column="1" Margin="15,0,0,0" Content="{Binding SelectedRule}" IsVisible="{Binding HasSelectedRule}">
+                <ContentControl.ContentTemplate>
+                  <DataTemplate x:DataType="vm:IssueRuleItem">
+                    <StackPanel>
+                      <TextBlock Classes="label" Margin="0,0,0,2" Text="Name:" />
+                      <TextBox Name="RuleName" PlaceholderText="Rule name" Text="{Binding Name}" />
+                      <StackPanel Orientation="Horizontal" Spacing="15" Margin="0,6,0,0">
+                        <RadioButton Name="LevelLocal" GroupName="IssueRuleLevel" Content="Local" FontSize="13" IsChecked="{Binding IsLocal}" />
+                        <RadioButton Name="LevelShared" GroupName="IssueRuleLevel" Content="Shared" FontSize="13" IsChecked="{Binding IsShared}" />
+                      </StackPanel>
+                      <TextBlock Classes="hint" Margin="6,4,0,0" Text="{Binding FileText}" />
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="label" Text="Parsing Regular Expression:" />
+                        <TextBlock Grid.Column="1" Classes="label" Text="valid" Foreground="{DynamicResource Color.Status.Success}" IsVisible="{Binding IsValid}" />
+                        <TextBlock Name="RegexInvalid" Grid.Column="1" Classes="label" Text="invalid" Foreground="{DynamicResource Color.Status.Error}"
+                                   IsVisible="{Binding IsInvalid}" />
+                      </Grid>
+                      <TextBox Name="RuleRegex" PlaceholderText="e.g.'(\d+)'" Text="{Binding Regex}" />
+                      <TextBlock Classes="label" Text="Result Url:" />
+                      <TextBox Name="RuleUrl" PlaceholderText="e.g.'https://github.com/project/issues/$1'" Text="{Binding Url}" />
+                      <TextBlock Classes="hint" Text="Access regex groups using $1, $2 etc variables" />
+                      <TextBlock Classes="label" Text="Test Message:" />
+                      <TextBox Name="TestMessage" PlaceholderText="Test commit message" Text="{Binding TestMessage}" />
+                      <SelectableTextBlock Name="Preview" FontSize="13" Margin="0,4,0,0" TextWrapping="Wrap" c:Hyperlinks.Content="{Binding Preview}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ContentControl.ContentTemplate>
+              </ContentControl>
+            </Grid>
+          </Panel>
+        </DockPanel>
+      </Panel>
+    </TabItem>
+  </TabControl>
+</UserControl>

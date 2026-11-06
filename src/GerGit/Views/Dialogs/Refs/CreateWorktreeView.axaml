@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.CreateWorktreeView"
+             x:DataType="vm:CreateWorktreeViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <!-- Create Worktree, Checkout Branch as Worktree, Checkout Remote Branch as Worktree. -->
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Start from:" IsVisible="{Binding IsCreate}" />
+    <ComboBox Name="StartBox" Grid.Column="1" HorizontalAlignment="Stretch" IsVisible="{Binding IsCreate}"
+              ItemsSource="{Binding Starts}" SelectedItem="{Binding Start}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:RefPoint"><c:RefView Icon="{Binding Icon}" Text="{Binding Text}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock Grid.Row="1" Classes="label" Text="Branch name:" IsVisible="{Binding IsCreate}" />
+    <c:RefNameBox Name="NameBox" Grid.Row="1" Grid.Column="1" Icon="git-branch" Text="{Binding Name}" PlaceholderText="Enter branch name"
+                  IsVisible="{Binding IsCreate}" />
+    <TextBlock Grid.Row="2" Classes="label" Text="{Binding BranchLabel}" IsVisible="{Binding IsCheckout}" />
+    <c:RefView Name="BranchView" Grid.Row="2" Grid.Column="1" IsVisible="{Binding IsCheckout}"
+               Icon="{Binding Branch.Icon, FallbackValue={x:Null}}" Text="{Binding Branch.Text, FallbackValue={x:Null}}" />
+    <TextBlock Grid.Row="3" Classes="label" Text="Location:" />
+    <DockPanel Grid.Row="3" Grid.Column="1">
+      <Button Name="BrowseButton" DockPanel.Dock="Right" Margin="4,0,0,0" Content="..." Click="OnBrowse" />
+      <TextBox Name="LocationBox" FontSize="13" Padding="4,2,4,2" Text="{Binding Location}" />
+    </DockPanel>
+  </Grid>
+</UserControl>

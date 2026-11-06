@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.PushTagsView"
+             x:DataType="vm:PushTagsViewModel"
+             c:RefView.HostOf="{Binding HostOf}">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+  </UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="*,Auto">
+    <TextBlock Classes="label" Text="Tag:" IsVisible="{Binding IsSingle}" />
+    <c:RefView Name="SingleTag" Grid.Column="1" Icon="tag" Text="{Binding Tag}" Height="24" IsVisible="{Binding IsSingle}" />
+    <TextBlock Classes="label" Text="Tags:" VerticalAlignment="Top" IsVisible="{Binding IsMany}" />
+    <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}" MinHeight="100"
+            IsVisible="{Binding IsMany}">
+      <ScrollViewer>
+        <ItemsControl Name="Tags" ItemsSource="{Binding Tags}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <c:RefView Icon="tag" Text="{Binding}" Height="20" Margin="4,0" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+    <TextBlock Classes="label" Grid.Row="1" Text="Remote:" />
+    <ComboBox Name="Remote" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Remotes}" SelectedItem="{Binding SelectedRemote}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="x:String"><c:RefView Remote="{Binding}" Text="{Binding}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+  </Grid>
+</UserControl>

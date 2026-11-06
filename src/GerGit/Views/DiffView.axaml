@@ -1,0 +1,246 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:c="using:GerGit.Controls"
+             xmlns:ae="using:AvaloniaEdit"
+             xmlns:search="using:AvaloniaEdit.Search"
+             x:Class="GerGit.Views.DiffView"
+             x:DataType="vm:DiffViewModel"
+             Background="{DynamicResource Color.Editor.Bg}">
+  <UserControl.Styles>
+    <Style Selector="Button.line-action">
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Margin" Value="2" />
+      <Setter Property="Padding" Value="8,0,8,0" />
+      <Setter Property="FontSize" Value="13" />
+      <!-- The editor keeps the focus (and its selection keys) after a click. -->
+      <Setter Property="Focusable" Value="False" />
+    </Style>
+    <Style Selector="TextBlock.card-title">
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Status.Removed}" />
+    </Style>
+    <Style Selector="TextBlock.card-title.new">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Status.Added}" />
+    </Style>
+    <!-- Image toggle: 40 x 24, radius 3, no border; hover and checked fills. -->
+    <Style Selector="RadioButton.image-mode">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Focusable" Value="False" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Width="40" Height="24" Margin="0,1,0,1" CornerRadius="3" Background="{TemplateBinding Background}">
+            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.image-mode:pointerover">
+      <Setter Property="Background" Value="{DynamicResource Color.Btn.BgHover}" />
+    </Style>
+    <Style Selector="RadioButton.image-mode:checked">
+      <Setter Property="Background" Value="{DynamicResource Color.Btn.BgPressed}" />
+    </Style>
+  </UserControl.Styles>
+  <UserControl.Resources>
+    <!-- Search inside a diff: AvaloniaEdit's search panel (one per editor, so one per pane) as a 30 px bar at
+         the top of the editor over the text; toolbar background, padding 6/4/4/4; box with search icon and placeholder
+         `Find`, then previous, next and close (16 px icons). Plain text, case-insensitive (the panel's defaults). The panel does not slide in; the match background has square corners. -->
+    <ControlTheme x:Key="{x:Type search:SearchPanel}" TargetType="search:SearchPanel">
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Border" Height="30" Padding="6,4,4,4" Background="{DynamicResource Color.Toolbar.Bg}">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="2" Margin="4,0,0,0" VerticalAlignment="Center">
+                <Button Name="FindPrevious" Classes="icon" Width="20" Height="20" Focusable="False"
+                        Command="{x:Static search:SearchCommands.FindPrevious}">
+                  <c:LucideIcon Icon="chevron-left" Size="16" />
+                </Button>
+                <Button Name="FindNext" Classes="icon" Width="20" Height="20" Focusable="False"
+                        Command="{x:Static search:SearchCommands.FindNext}">
+                  <c:LucideIcon Icon="chevron-right" Size="16" />
+                </Button>
+                <Button Name="CloseFind" Classes="icon" Width="20" Height="20" Focusable="False"
+                        Command="{x:Static search:SearchCommands.CloseSearchPanel}">
+                  <c:LucideIcon Icon="x" Size="16" />
+                </Button>
+              </StackPanel>
+              <!-- The panel reads the replace box unchecked in its copy/paste handlers; it is never shown. -->
+              <TextBox Name="PART_replaceTextBox" IsVisible="False" />
+              <TextBox Name="PART_searchTextBox" Classes="filter" Height="22" PlaceholderText="Find"
+                       Text="{Binding SearchPattern, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                <TextBox.InnerLeftContent>
+                  <c:LucideIcon Icon="search" Size="14" Margin="4,0,2,0" VerticalAlignment="Center" Foreground="{DynamicResource Color.Glyph.Default}" />
+                </TextBox.InnerLeftContent>
+              </TextBox>
+            </DockPanel>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </ControlTheme>
+  </UserControl.Resources>
+  <!-- Diff viewer, unified and side-by-side layouts. Not built yet: LFS or submodule views, syntax highlighting,
+       hidden symbols, word wrap, change map or scroll memory yet. -->
+  <Grid RowDefinitions="Auto,*">
+    <!-- Header strip: 18 px, 1 px bottom border; zones 100 | * | 140. -->
+    <Border Classes="diff-header" IsVisible="{Binding ShowHeader}">
+      <Grid ColumnDefinitions="100,*,140">
+        <StackPanel Orientation="Horizontal" IsVisible="{Binding IsText}" Margin="4,0">
+          <Button Classes="icon diff" ToolTip.Tip="Go to previous change, Ctrl+↑" Click="OnPreviousChange">
+            <c:LucideIcon Icon="arrow-up" Size="13" />
+          </Button>
+          <Button Classes="icon diff" ToolTip.Tip="Go to next change, Ctrl+↓" Click="OnNextChange">
+            <c:LucideIcon Icon="arrow-down" Size="13" />
+          </Button>
+        </StackPanel>
+        <TextBlock Name="PathText" Grid.Column="1" Classes="diff-path" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding PathToolTip}">
+          <Run Classes="dir" Text="{Binding OldDir}" /><Run Text="{Binding OldName}" /><Run Classes="dir" Text="{Binding Arrow}" /><Run Classes="dir" Text="{Binding Dir}" /><Run Text="{Binding Name}" />
+        </TextBlock>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" IsVisible="{Binding IsText}" Margin="4,0">
+          <ToggleButton Classes="diff" ToolTip.Tip="Ignore whitespaces" IsChecked="{Binding IgnoreWhitespace}">
+            <c:LucideIcon Icon="space" Size="13" />
+          </ToggleButton>
+          <Button Classes="icon diff" ToolTip.Tip="Decrease number of visible lines" IsVisible="{Binding ShowContextControls}" Command="{Binding FewerLinesCommand}">
+            <c:LucideIcon Icon="chevrons-down-up" Size="13" />
+          </Button>
+          <Button Classes="icon diff" ToolTip.Tip="Increase number of visible lines" IsVisible="{Binding ShowContextControls}" Command="{Binding MoreLinesCommand}">
+            <c:LucideIcon Icon="chevrons-up-down" Size="13" />
+          </Button>
+          <ToggleButton Classes="diff" ToolTip.Tip="Show entire file" IsVisible="{Binding ShowContextControls}" IsChecked="{Binding EntireFile}">
+            <c:LucideIcon Icon="file-text" Size="13" />
+          </ToggleButton>
+          <ToggleButton Name="LayoutButton" Classes="diff" ToolTip.Tip="{Binding LayoutToolTip}" IsVisible="{Binding ShowLayoutToggle}"
+                        IsChecked="{Binding SideBySide}">
+            <c:LucideIcon Icon="columns-2" Size="13" />
+          </ToggleButton>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" IsVisible="{Binding IsImage}" Margin="4,0">
+          <ToggleButton Name="HighlightButton" Classes="diff" ToolTip.Tip="Highlight pixels"
+                        IsChecked="{Binding HighlightPixels}" IsEnabled="{Binding CanHighlight}">
+            <c:LucideIcon Icon="scan-eye" Size="13" />
+          </ToggleButton>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- The host holds the editor(s) and the floating stage/discard buttons; leaving it hides them.
+         Unified: Editor spans both columns. Side by side: OldEditor (left, no vertical scrollbar) | Editor (right, new). -->
+    <Grid Name="EditorHost" Grid.Row="1" ClipToBounds="True" ColumnDefinitions="*,*">
+      <ae:TextEditor Name="OldEditor" IsVisible="{Binding IsSideBySideText}" IsReadOnly="True"
+                     FontFamily="{DynamicResource Font.Mono}"
+                     FontSize="{Binding EditorFontSize, Source={x:Static vm:AppPreferences.Current}}"
+                     Background="{DynamicResource Color.Editor.Bg}" Foreground="{DynamicResource Color.Editor.Fg}"
+                     SearchResultsBrush="{DynamicResource Color.Search.MatchBg}"
+                     HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden" />
+      <ae:TextEditor Name="Editor" Grid.ColumnSpan="2" IsVisible="{Binding IsText}" IsReadOnly="True"
+                     FontFamily="{DynamicResource Font.Mono}"
+                     FontSize="{Binding EditorFontSize, Source={x:Static vm:AppPreferences.Current}}"
+                     Background="{DynamicResource Color.Editor.Bg}" Foreground="{DynamicResource Color.Editor.Fg}"
+                     SearchResultsBrush="{DynamicResource Color.Search.MatchBg}"
+                     HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+      <Border Name="LineButtons" Grid.ColumnSpan="2" IsVisible="False" HorizontalAlignment="Right" VerticalAlignment="Top" MinWidth="40"
+              CornerRadius="3" Background="{DynamicResource Color.Diff.FloatingButtonsBg}">
+        <StackPanel Orientation="Horizontal">
+          <Button Name="StageButton" Classes="line-action" Content="Stage" Click="OnStage" />
+          <Button Name="DiscardButton" Classes="line-action" Content="Discard..." Click="OnDiscard" />
+          <Button Name="UnstageButton" Classes="line-action" Content="Unstage" Click="OnUnstage" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Binary files: image and unknown-binary cards, Swipe / Onion Skin, radio bar. -->
+    <Grid Grid.Row="1" RowDefinitions="*,Auto" IsVisible="{Binding IsCards}">
+      <ItemsControl Name="CardList" ItemsSource="{Binding Cards}" IsVisible="{Binding !IsStacked}" Margin="5">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Rows="1" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:BinaryCard">
+            <DockPanel Margin="5" VerticalAlignment="Center">
+              <TextBlock DockPanel.Dock="Top" Classes="card-title" Classes.new="{Binding IsNew}" Text="{Binding Title}" />
+              <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0" Spacing="2">
+                <TextBlock Text="{Binding Caption}" ToolTip.Tip="{Binding SizeTip}" VerticalAlignment="Center" />
+                <Button Classes="icon" IsVisible="{Binding CanSave}" Click="OnCardMenu" Width="16" Height="16">
+                  <c:LucideIcon Icon="chevron-down" Size="12" />
+                </Button>
+              </StackPanel>
+              <Panel>
+                <!-- Image: checkerboard, 8 px border, 1 px outer border, soft shadow; scaled down, never up. -->
+                <Border IsVisible="{Binding HasImage}" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="8"
+                        CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Color.Binarydiff.Border}"
+                        Background="{DynamicResource Color.Binarydiff.Bg}" BoxShadow="0 0 8 0 #40000000">
+                  <Panel Background="{DynamicResource ImageDiff.Checker}">
+                    <Image Source="{Binding Image}" StretchDirection="DownOnly" />
+                    <Image Source="{Binding Overlay}" StretchDirection="DownOnly" />
+                  </Panel>
+                </Border>
+                <!-- Unknown binary (and images that did not decode): 110x130 card with icon, extension and why there is no preview. -->
+                <Border IsVisible="{Binding !HasImage}" Width="110" Height="130" CornerRadius="3" ToolTip.Tip="{Binding SizeTip}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" Background="{DynamicResource Color.Binarydiff.Bg}">
+                  <StackPanel VerticalAlignment="Center" Spacing="6">
+                    <c:LucideIcon Icon="file" Size="32" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+                    <TextBlock Text="{Binding Extension}" FontSize="13" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+                    <TextBlock Text="{Binding Note}" IsVisible="{Binding Note, Converter={x:Static ObjectConverters.IsNotNull}}" FontSize="11"
+                               TextWrapping="Wrap" TextAlignment="Center" Margin="4,0" Foreground="{DynamicResource Color.Text.Muted}" />
+                  </StackPanel>
+                </Border>
+              </Panel>
+            </DockPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Grid IsVisible="{Binding IsStacked}" RowDefinitions="Auto,*,Auto" Margin="19,10,19,10">
+        <Grid ColumnDefinitions="*,*">
+          <TextBlock Classes="card-title" Text="old" HorizontalAlignment="Left" />
+          <TextBlock Grid.Column="1" Classes="card-title new" Text="new" HorizontalAlignment="Right" />
+        </Grid>
+        <c:ImageStack Name="Stack" Grid.Row="1" Old="{Binding OldImage}" New="{Binding NewImage}" Overlay="{Binding Overlay}"
+                      Swipe="{Binding IsSwipe}" NewOpacity="{Binding OnionOpacity}"
+                      Split="{Binding SwipePosition}" />
+        <Slider Grid.Row="2" Width="220" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.01" IsSnapToTickEnabled="True"
+                Value="{Binding OnionOpacity}" IsVisible="{Binding IsOnionSkin}" />
+      </Grid>
+
+      <StackPanel Name="ModeBar" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Height="26" Margin="0,0,0,6"
+                  IsVisible="{Binding ShowModes}">
+        <RadioButton Classes="image-mode" ToolTip.Tip="Side-by-Side" IsChecked="{Binding IsSideBySide}">
+          <c:LucideIcon Icon="columns-2" Size="14" />
+        </RadioButton>
+        <RadioButton Classes="image-mode" ToolTip.Tip="Swipe" IsChecked="{Binding IsSwipe}">
+          <c:LucideIcon Icon="square-split-horizontal" Size="14" />
+        </RadioButton>
+        <RadioButton Classes="image-mode" ToolTip.Tip="Onion Skin" IsChecked="{Binding IsOnionSkin}">
+          <c:LucideIcon Icon="layers" Size="14" />
+        </RadioButton>
+      </StackPanel>
+    </Grid>
+
+    <ScrollViewer Grid.Row="1" IsVisible="{Binding IsTooLarge}">
+      <StackPanel Classes="fallback">
+        <c:LucideIcon Icon="file-question" Size="100" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+        <TextBlock Classes="empty-title" Text="{Binding TooLargeTitle}" />
+        <Button HorizontalAlignment="Center" Content="Load Diff" Command="{Binding LoadDiffCommand}" />
+      </StackPanel>
+    </ScrollViewer>
+
+    <ScrollViewer Grid.Row="1" IsVisible="{Binding IsError}">
+      <StackPanel Classes="fallback">
+        <c:LucideIcon Icon="file-question" Size="100" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+        <TextBlock Classes="empty-title" Text="Error" />
+        <SelectableTextBlock Classes="empty-text" TextWrapping="Wrap" Text="{Binding ErrorText}" />
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Nothing selected: empty fallback with the muted illustration, no text. -->
+    <Border Grid.Row="1" IsVisible="{Binding IsEmpty}" Background="{DynamicResource Color.Surface.EmptyState}">
+      <c:LucideIcon Icon="file-question" Size="100" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Foreground="{DynamicResource Color.Text.Muted}" Opacity="0.3" />
+    </Border>
+  </Grid>
+</UserControl>

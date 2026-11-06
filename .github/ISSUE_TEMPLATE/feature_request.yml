@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest an idea
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Please check the [roadmap](https://github.com/IcaruzSoftware/GerGit/blob/main/ROADMAP.md) and existing issues first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem do you want to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: input
+    id: version
+    attributes:
+      label: GerGit version
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and desktop (GNOME/KDE, X11/Wayland)
+  - type: input
+    id: git
+    attributes:
+      label: git version

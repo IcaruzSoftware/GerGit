@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.ResetView"
+             x:DataType="vm:ResetViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Branch:" />
+    <c:RefView Name="Branch" Grid.Column="1" Icon="git-branch" Text="{Binding Branch}" />
+    <TextBlock Grid.Row="1" Classes="label" Text="Move to:" />
+    <c:RefView Name="Target" Grid.Row="1" Grid.Column="1" Icon="{Binding Target.Icon}" Text="{Binding Target.Text}" Detail="{Binding Target.Detail}" />
+    <TextBlock Grid.Row="2" Classes="label" Text="Reset type:" />
+    <ComboBox Name="KindBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" SelectedIndex="{Binding SelectedIndex}">
+      <ComboBoxItem>
+        <Grid ColumnDefinitions="18,70,*,20" Width="420">
+          <Ellipse Classes="dot" HorizontalAlignment="Left" Fill="#34C84A" />
+          <TextBlock Grid.Column="1" Text="Soft" />
+          <TextBlock Grid.Column="2" Classes="description" Text="Keep all changes. Stage differences" />
+          <TextBlock Grid.Column="3" Classes="description" HorizontalAlignment="Right" Text="S" />
+        </Grid>
+      </ComboBoxItem>
+      <ComboBoxItem>
+        <Grid ColumnDefinitions="18,70,*,20" Width="420">
+          <Ellipse Classes="dot" HorizontalAlignment="Left" Fill="#FDBE41" />
+          <TextBlock Grid.Column="1" Text="Mixed" />
+          <TextBlock Grid.Column="2" Classes="description" Text="Keep all changes. Unstage differences" />
+          <TextBlock Grid.Column="3" Classes="description" HorizontalAlignment="Right" Text="M" />
+        </Grid>
+      </ComboBoxItem>
+      <ComboBoxItem>
+        <Grid ColumnDefinitions="18,70,*,20" Width="420">
+          <Ellipse Classes="dot" HorizontalAlignment="Left" Fill="#FA4B49" />
+          <TextBlock Grid.Column="1" Text="Hard" />
+          <TextBlock Grid.Column="2" Classes="description" Text="Discard all local changes" />
+          <TextBlock Grid.Column="3" Classes="description" HorizontalAlignment="Right" Text="H" />
+        </Grid>
+      </ComboBoxItem>
+    </ComboBox>
+  </Grid>
+</UserControl>

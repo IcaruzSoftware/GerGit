@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.DeleteRefsView"
+             x:DataType="vm:DeleteRefsViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <!-- Delete Branch(es), Delete Remote Branch(es), Delete Tag(s). -->
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="*,Auto,Auto">
+    <TextBlock Classes="label" Text="{Binding Label}" VerticalAlignment="Top" Margin="0,2,0,0" />
+    <c:RefView Name="Single" Grid.Column="1" IsVisible="{Binding IsSingle}" Icon="{Binding First.Icon}" Text="{Binding First.Name}" />
+    <Border Grid.Column="1" IsVisible="{Binding IsMultiple}" Height="{Binding ListHeight}" BorderThickness="1"
+            BorderBrush="{DynamicResource Color.List.Border}" Background="{DynamicResource Color.List.Bg}">
+      <ListBox Name="List" ItemsSource="{Binding Rows}" Background="Transparent">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:DeleteRow">
+            <StackPanel Orientation="Horizontal" Spacing="6" Height="20">
+              <c:RefView Icon="{Binding Icon}" Text="{Binding Name}" />
+              <StackPanel Orientation="Horizontal" Spacing="6"
+                          IsVisible="{Binding $parent[ListBox].((vm:DeleteRefsViewModel)DataContext).IsChecked}">
+                <c:RefView IsVisible="{Binding RemoteBranch, Converter={x:Static ObjectConverters.IsNotNull}}" Icon="arrow-right" />
+                <c:RefView IsVisible="{Binding RemoteBranch, Converter={x:Static ObjectConverters.IsNotNull}}" Icon="cloud" Text="{Binding RemoteBranch}" />
+              </StackPanel>
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+    <c:LucideIcon Name="CheckWarning" Grid.Row="1" Classes="warning" HorizontalAlignment="Right" IsVisible="{Binding ShowCheckWarning}" />
+    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasCheck}">
+      <CheckBox Name="OptionCheck" Content="{Binding CheckText}" IsChecked="{Binding IsChecked}" IsEnabled="{Binding CheckEnabled}"
+                ToolTip.Tip="{Binding CheckToolTip}" />
+      <c:RefView Name="CheckDetail" Icon="cloud" Text="{Binding CheckDetail}"
+                 IsVisible="{Binding CheckDetail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+    </StackPanel>
+    <!-- "Also delete worktree": a single branch checked out in another worktree. -->
+    <c:LucideIcon Name="WorktreeWarning" Grid.Row="2" Classes="warning" HorizontalAlignment="Right" IsVisible="{Binding DeleteWorktree}" />
+    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasWorktreeCheck}">
+      <CheckBox Name="WorktreeCheck" Content="Also delete _worktree" IsChecked="{Binding DeleteWorktree}" ToolTip.Tip="Alt+W" />
+      <c:RefView Name="WorktreeDetail" Icon="folder-git-2" Text="{Binding WorktreeName}" />
+    </StackPanel>
+  </Grid>
+</UserControl>

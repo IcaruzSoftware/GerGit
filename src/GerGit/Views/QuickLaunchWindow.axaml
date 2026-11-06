@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GerGit.ViewModels"
+        xmlns:v="using:GerGit.Views"
+        xmlns:c="using:GerGit.Controls"
+        x:Class="GerGit.Views.QuickLaunchWindow"
+        x:DataType="vm:QuickLaunchViewModel"
+        Title="Quick Launch" Width="620" Height="370" CanResize="False" WindowDecorations="None" ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource Color.Window.Bg}">
+  <Window.Styles>
+    <Style Selector="TextBox.quick">
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="6,0" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox.quick:pointerover /template/ Border#PART_BorderElement, TextBox.quick:focus /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="TextBlock.secondary">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Secondary}" />
+    </Style>
+    <Style Selector="Panel.row c|LucideIcon">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Icon.Default}" />
+    </Style>
+    <Style Selector="Panel.row c|HostIcon">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Icon.Default}" />
+    </Style>
+    <Style Selector="Panel.row">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Panel.row.selected">
+      <Setter Property="Background" Value="{DynamicResource Color.Row.BgSelected}" />
+    </Style>
+    <!-- The selected row: active-selection colours and the light icon variant. -->
+    <Style Selector="Panel.row.selected TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.OnAccent}" />
+    </Style>
+    <Style Selector="Panel.row.selected c|LucideIcon">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.OnAccent}" />
+    </Style>
+    <Style Selector="Panel.row.selected c|HostIcon">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.OnAccent}" />
+    </Style>
+  </Window.Styles>
+  <!-- Quick Launch: no title bar, 1 px border, search icon and input line, separator, result list. -->
+  <Border BorderThickness="1" BorderBrush="{DynamicResource Color.Accent.WindowBorder}">
+    <DockPanel>
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*" Height="28" Margin="10,10,10,6">
+        <c:LucideIcon Icon="search" Size="16" VerticalAlignment="Center" Foreground="{DynamicResource Color.Icon.Default}" />
+        <Border Name="Chip" Grid.Column="1" Margin="8,0,0,0" CornerRadius="3" Padding="6,0,6,2" VerticalAlignment="Center"
+                Background="{DynamicResource Color.Cmdinput.LabelBg}" IsVisible="{Binding Chip, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <TextBlock Text="{Binding Chip}" FontSize="14" Foreground="{DynamicResource Color.Cmdinput.LabelFg}" />
+        </Border>
+        <TextBox Name="Input" Grid.Column="2" Classes="quick" Text="{Binding Text}" PlaceholderText="{Binding Placeholder}" />
+      </Grid>
+      <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource Color.Border.Default}" />
+      <ScrollViewer Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl Name="List" ItemsSource="{Binding Rows}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:QuickRow">
+              <Panel Classes="row" Classes.selected="{Binding IsSelected}" Height="25" PointerReleased="OnRowReleased">
+                <TextBlock Margin="10,0" VerticalAlignment="Center" FontSize="13.5" FontWeight="Medium" Text="{Binding Header}"
+                           IsVisible="{Binding IsHeader}" />
+                <Grid Margin="10,0" ColumnDefinitions="Auto,Auto,*" IsVisible="{Binding !IsHeader}">
+                  <Panel Width="14" Height="14" VerticalAlignment="Center">
+                    <c:LucideIcon Icon="{Binding Choice.Icon, FallbackValue={x:Null}}" Size="14" IsVisible="{Binding !IsRemote}" />
+                    <c:HostIcon Type="{Binding Choice.Host, FallbackValue=Custom, TargetNullValue=Custom}" Size="14" IsVisible="{Binding IsRemote}" />
+                  </Panel>
+                  <TextBlock Grid.Column="1" Margin="8,0,0,0" FontSize="14" VerticalAlignment="Center"
+                             Inlines="{Binding Converter={x:Static v:QuickLaunchWindow.NameInlines}}" />
+                  <TextBlock Grid.Column="2" Classes="secondary" Margin="6,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                             IsVisible="{Binding HasSecondary}" Inlines="{Binding Converter={x:Static v:QuickLaunchWindow.SecondaryInlines}}" />
+                </Grid>
+              </Panel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DockPanel>
+  </Border>
+</Window>

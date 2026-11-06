@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Hosting"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Hosting.CreatePullRequestView"
+             x:DataType="vm:CreatePullRequestViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+  </UserControl.Styles>
+  <!-- Source (read-only), title, description, target branch. -->
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Source branch:" />
+    <c:RefView Name="Source" Grid.Column="1" Icon="git-branch" Text="{Binding Source}" Height="24" />
+    <TextBlock Classes="label" Grid.Row="1" Text="Title:" />
+    <TextBox Name="TitleBox" Grid.Row="1" Grid.Column="1" Text="{Binding RequestTitle}" IsEnabled="{Binding IsEditable}" />
+    <TextBlock Classes="label" Grid.Row="2" Text="Description:" VerticalAlignment="Top" Margin="0,4,0,0" />
+    <TextBox Name="BodyBox" Grid.Row="2" Grid.Column="1" Text="{Binding Body}" AcceptsReturn="True" TextWrapping="Wrap"
+             Height="120" IsEnabled="{Binding IsEditable}" />
+    <TextBlock Classes="label" Grid.Row="3" Text="Target branch:" />
+    <ComboBox Name="Target" Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Targets}" SelectedItem="{Binding SelectedTarget}"
+              IsEnabled="{Binding IsEditable}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="x:String"><c:RefView Icon="git-branch" Text="{Binding}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+  </Grid>
+</UserControl>

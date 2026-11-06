@@ -1,0 +1,4 @@
+debian/build/publish/* usr/lib/gergit/
+packaging/gergit.desktop usr/share/applications/
+packaging/gergit.svg usr/share/icons/hicolor/scalable/apps/
+packaging/io.github.icaruzsoftware.GerGit.metainfo.xml usr/share/metainfo/

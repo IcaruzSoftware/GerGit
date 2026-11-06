@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Accounts"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Accounts.AddAccountView"
+             x:DataType="vm:AddAccountViewModel">
+  <UserControl.Styles>
+    <!-- Add Account window: 75 x 85 tiles, 3 px border with radius 3, accent border when selected. -->
+    <Style Selector="ListBox#TileList > ListBoxItem">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="2" />
+      <Setter Property="BorderThickness" Value="3" />
+      <Setter Property="CornerRadius" Value="3" />
+    </Style>
+    <Style Selector="ListBox#TileList > ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Accent.Base}" />
+    </Style>
+  </UserControl.Styles>
+  <Grid RowDefinitions="Auto,*">
+    <TextBlock Text="Add Account" FontSize="15" FontWeight="Medium" />
+    <ListBox Name="TileList" Grid.Row="1" Margin="0,8,0,0" Padding="4,5,5,0" ItemsSource="{Binding Tiles}"
+             SelectedItem="{Binding SelectedTile}" Background="Transparent" DoubleTapped="OnTileDoubleTapped">
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:AccountTile">
+          <StackPanel Width="69" Height="79">
+            <c:HostIcon Type="{Binding Type}" Size="24" Margin="4,6,4,0" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding Name}" FontSize="12" Margin="4,2" TextAlignment="Center" TextWrapping="Wrap" />
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
+</UserControl>

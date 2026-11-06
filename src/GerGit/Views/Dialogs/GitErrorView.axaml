@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.GitErrorView"
+             x:DataType="vm:GitErrorViewModel">
+  <!-- Error window: viewer in a 1 px accent-secondary border, then the optional action button. -->
+  <DockPanel>
+    <Button Name="ActionButton" DockPanel.Dock="Bottom" HorizontalAlignment="Left" Margin="0,14,4,4"
+            Content="{Binding ActionText}" Command="{Binding RunActionCommand}"
+            IsVisible="{Binding ActionText, Converter={x:Static ObjectConverters.IsNotNull}}" />
+    <Border BorderThickness="1" BorderBrush="{DynamicResource Color.Accent.Secondary}" Background="{DynamicResource Color.Editor.Bg}">
+      <c:OutputView Name="Output" Text="{Binding Text}" />
+    </Border>
+  </DockPanel>
+</UserControl>

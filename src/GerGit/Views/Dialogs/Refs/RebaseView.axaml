@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.RebaseView"
+             x:DataType="vm:RebaseViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <!-- Rebase dialog. -->
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Rebase:" />
+    <c:RefView Name="Source" Grid.Column="1" Icon="{Binding Source.Icon}" Text="{Binding Source.Text}" />
+    <TextBlock Grid.Row="1" Classes="label" Text="On:" />
+    <c:RefView Name="Target" Grid.Row="1" Grid.Column="1" Icon="{Binding Target.Icon}" Text="{Binding Target.Text}"
+               Detail="{Binding Target.Detail}" />
+    <CheckBox Name="UpdateRefsBox" Grid.Row="2" Grid.Column="1" Content="Update dependent branches" ToolTip.Tip="--update-refs"
+              IsChecked="{Binding UpdateRefs}" IsVisible="{Binding ShowUpdateRefs}" />
+    <ScrollViewer Name="BranchList" Grid.Row="3" Grid.Column="1" MaxHeight="72" Margin="30,0,0,0" IsVisible="{Binding ShowBranchList}">
+      <ItemsControl ItemsSource="{Binding Branches}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <StackPanel Orientation="Horizontal" Spacing="6" Height="18">
+              <c:LucideIcon Icon="git-branch" Size="16" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding}" FontSize="13" VerticalAlignment="Center" />
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+    <CheckBox Name="AutostashBox" Grid.Row="4" Grid.Column="1" Content="Stash and reapply local changes" IsChecked="{Binding Autostash}" />
+  </Grid>
+</UserControl>

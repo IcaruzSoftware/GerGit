@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.icaruzsoftware.GerGit</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>GerGit</name>
+  <summary>Fast, native Git client</summary>
+  <developer id="io.github.icaruzsoftware">
+    <name>Gerrit Visser</name>
+  </developer>
+  <description>
+    <p>
+      GerGit is a desktop Git client for Linux. Every operation runs the system git command,
+      so repositories, hooks and configuration behave exactly as on the command line.
+    </p>
+    <ul>
+      <li>Commit graph with search, branches, remotes, tags, stashes, worktrees and submodules</li>
+      <li>Stage files, hunks or single lines; commit, amend, and commit and push in one step</li>
+      <li>Inline and side-by-side diff, image diff, blame and file history</li>
+      <li>Interactive rebase and a three-pane conflict resolver</li>
+      <li>GitHub and GitLab accounts with pull and merge requests</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">gergit.desktop</launchable>
+  <url type="homepage">https://github.com/IcaruzSoftware/GerGit</url>
+  <url type="bugtracker">https://github.com/IcaruzSoftware/GerGit/issues</url>
+  <categories>
+    <category>Development</category>
+    <category>RevisionControl</category>
+  </categories>
+  <releases>
+    <release version="1.0.2" date="2026-11-06"/>
+    <release version="1.0.1" date="2026-11-06"/>
+    <release version="1.0.0" date="2026-11-06"/>
+  </releases>
+  <provides>
+    <binary>gergit</binary>
+  </provides>
+  <content_rating type="oars-1.1" />
+</component>

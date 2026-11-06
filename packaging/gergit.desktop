@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=GerGit
+GenericName=Git Client
+Comment=Graphical Git client
+Exec=gergit %f
+Icon=gergit
+Terminal=false
+Categories=Development;RevisionControl;
+StartupWMClass=GerGit

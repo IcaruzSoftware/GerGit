@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:v="using:GerGit.Views"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.RepoTabView"
+             x:DataType="vm:RepoTabViewModel">
+  <!-- Repository tab content: row 0 = notification bar over all columns.
+       Limitation: the sidebar width is not saved. -->
+  <DockPanel>
+  <v:ConflictBanner DockPanel.Dock="Top" IsVisible="{Binding HasBanner}" />
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="300" MinWidth="120" MaxWidth="600" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <v:SidebarView DataContext="{Binding Sidebar}" />
+
+    <!-- Revision view: rows and columns are set by the commit list layout (code-behind, ApplyLayout). The commit list's
+         search text is highlighted in the details pane (inherited). -->
+    <Grid Name="RevisionGrid" Grid.Column="2" IsVisible="{Binding IsAllCommitsView}"
+          c:SearchHighlight.Text="{Binding CommitList.SearchText}">
+      <v:CommitListView Name="RevisionList" DataContext="{Binding CommitList}" />
+      <v:DetailsView Name="DetailsPane" DataContext="{Binding Details}" />
+      <GridSplitter Name="ListSplitter" />
+    </Grid>
+
+    <Panel Grid.Column="2" IsVisible="{Binding IsLocalChangesView}">
+      <v:LocalChangesView DataContext="{Binding LocalChanges}" />
+    </Panel>
+
+    <GridSplitter Grid.Column="1" Classes="v" />
+  </Grid>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.CustomBranchNameView"
+             x:DataType="vm:CustomBranchNameViewModel">
+  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+    <TextBlock Name="Prefix" Text="{Binding Prefix}" FontSize="13" VerticalAlignment="Center" />
+    <c:RefNameBox Name="BranchName" Grid.Column="1" Text="{Binding Name}" PlaceholderText="Remote Branch Name" />
+  </Grid>
+</UserControl>

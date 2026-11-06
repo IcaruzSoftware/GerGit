@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             x:Class="GerGit.Views.Dialogs.GoToLineView"
+             x:DataType="vm:GoToLineViewModel">
+  <!-- Go To Line: label and a 22 px text box with an 8 px left margin. -->
+  <DockPanel Margin="10,10,10,0">
+    <TextBlock DockPanel.Dock="Left" FontSize="13" VerticalAlignment="Center" Text="Line number:" />
+    <TextBox Name="LineBox" Height="22" MinHeight="22" Margin="8,0,0,0" Padding="4,0" VerticalContentAlignment="Center"
+             Text="{Binding Text}" />
+  </DockPanel>
+</UserControl>

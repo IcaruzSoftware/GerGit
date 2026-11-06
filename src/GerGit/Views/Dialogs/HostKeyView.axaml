@@ -1,0 +1,10 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             x:Class="GerGit.Views.Dialogs.HostKeyView"
+             x:DataType="vm:HostKeyViewModel">
+  <Border BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}" Background="{DynamicResource Color.Editor.Bg}">
+    <SelectableTextBlock Name="KeyText" Text="{Binding Text}" FontFamily="{DynamicResource Font.Mono}" FontSize="12"
+                         TextWrapping="Wrap" Margin="6" />
+  </Border>
+</UserControl>

@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.CreateTagView"
+             x:DataType="vm:CreateTagViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Create tag at:" />
+    <c:RefView Name="Start" Grid.Column="1" Icon="{Binding Start.Icon}" Text="{Binding Start.Text}" Detail="{Binding Start.Detail}" />
+    <TextBlock Grid.Row="1" Classes="label" Text="Tag Name:" />
+    <c:RefNameBox Name="NameBox" Grid.Row="1" Grid.Column="1" Icon="tag" Text="{Binding Name}" PlaceholderText="Enter tag name" />
+    <TextBlock Grid.Row="2" Classes="label" Text="Message:" VerticalAlignment="Top" Margin="0,4,0,0" />
+    <TextBox Name="MessageBox" Grid.Row="2" Grid.Column="1" Height="100" AcceptsReturn="True" TextWrapping="Wrap"
+             Text="{Binding Message}" PlaceholderText="Enter tag message (optional)" />
+    <CheckBox Name="PushBox" Grid.Row="3" Grid.Column="1" Content="{Binding PushText}" IsChecked="{Binding Push}" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <InternalsVisibleTo Include="GerGit.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../GerGit.Core/GerGit.Core.csproj" />
+  </ItemGroup>
+</Project>

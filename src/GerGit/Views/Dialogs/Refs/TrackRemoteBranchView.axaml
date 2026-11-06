@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.TrackRemoteBranchView"
+             x:DataType="vm:TrackRemoteBranchViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Remote branch:" />
+    <c:RefView Name="Remote" Grid.Column="1" Icon="{Binding Remote.Icon}" Text="{Binding Remote.Text}" />
+    <TextBlock Grid.Row="1" Classes="label" Text="Local branch:" />
+    <c:RefNameBox Name="NameBox" Grid.Row="1" Grid.Column="1" Icon="git-branch" Text="{Binding Name}" PlaceholderText="Enter branch name" />
+    <TextBlock Grid.Row="2" Classes="label" Text="Local changes:" IsVisible="{Binding Local.IsVisible}" />
+    <r:LocalChangesBlockView Name="LocalBlock" Grid.Row="2" Grid.Column="1" DataContext="{Binding Local}" />
+  </Grid>
+</UserControl>

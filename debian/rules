@@ -1,0 +1,49 @@
+#!/usr/bin/make -f
+# Offline build: Launchpad builders have no network. NuGet packages come from the orig-nuget component
+# (unpacked to nuget/, made by packaging/vendor-nuget.sh); the runtime and apphost packs for the SDK's
+# own RID (ubuntu.<release>-<arch>) and ILLink come with the dotnet-sdk-10.0 build dependency.
+
+include /usr/share/dpkg/pkg-info.mk
+
+BUILD := $(CURDIR)/debian/build
+export HOME := $(BUILD)/home
+export DOTNET_CLI_HOME := $(HOME)
+export NUGET_PACKAGES := $(BUILD)/packages
+export DOTNET_CLI_TELEMETRY_OPTOUT := 1
+export DOTNET_NOLOGO := 1
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE := 1
+export DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE := 1
+export AVALONIA_TELEMETRY_OPTOUT := 1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	mkdir -p $(HOME)
+	# Same publish as packaging/build-deb.sh: self-contained single file, native libraries next to it.
+	rid=$$(dotnet --info | sed -n 's/^ *RID: *//p' | head -n1) && test -n "$$rid" && \
+	dotnet publish src/GerGit -c Release -r $$rid \
+	  -p:IncludeNativeLibrariesForSelfExtract=false \
+	  -p:Version=$(subst ~,-,$(DEB_VERSION_UPSTREAM)) \
+	  -p:RestoreConfigFile=$(CURDIR)/debian/nuget.config -p:NuGetAudit=false \
+	  -p:ContinuousIntegrationBuild=true \
+	  --artifacts-path $(BUILD)/artifacts -o $(BUILD)/publish --disable-build-servers
+
+# The tests need their own packages (xUnit, ...) that are not vendored; they run upstream before each release.
+override_dh_auto_test:
+
+override_dh_auto_clean:
+	rm -rf $(BUILD)
+
+execute_after_dh_install:
+	install -Dm644 src/GerGit/Assets/gergit.png debian/gergit/usr/share/icons/hicolor/256x256/apps/gergit.png
+
+# GerGit is a single-file bundle: the managed app is appended to the ELF host, and strip or dwz would cut it off.
+# The NuGet native libraries carry no debug info, so a -dbgsym package would be empty.
+override_dh_strip:
+	dh_strip --exclude=/GerGit --no-automatic-dbgsym
+
+override_dh_dwz:
+
+# libSkiaSharp/libHarfBuzzSharp are private to GerGit: no shlibs file, no ldconfig trigger.
+override_dh_makeshlibs:

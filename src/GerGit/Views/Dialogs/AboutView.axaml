@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             x:Class="GerGit.Views.Dialogs.AboutView"
+             x:DataType="vm:AboutViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Accounts/AccountStyles.axaml" />
+  </UserControl.Styles>
+  <!-- About GerGit: centred icon, name, version, description, copyright, license, credit, links and runtime versions. -->
+  <StackPanel Margin="0,8,0,0" Spacing="4" HorizontalAlignment="Center">
+    <Image Source="/Assets/gergit.png" Width="80" Height="80" HorizontalAlignment="Center"
+           RenderOptions.BitmapInterpolationMode="HighQuality" />
+    <TextBlock Name="AppName" Text="GerGit" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"
+               Foreground="{DynamicResource Color.Text.Primary}" />
+    <SelectableTextBlock Name="VersionText" Classes="description" HorizontalAlignment="Center" Text="{Binding VersionLine}" />
+    <TextBlock Name="Tagline" FontSize="13" HorizontalAlignment="Center" Margin="0,8,0,0" TextWrapping="Wrap" TextAlignment="Center"
+               Foreground="{DynamicResource Color.Text.Primary}" Text="A fast, native Git client for Linux." />
+    <TextBlock Name="Copyright" Classes="description" HorizontalAlignment="Center" Margin="0,8,0,0" Text="Copyright © 2026 Gerrit Visser" />
+    <TextBlock Name="License" Classes="description" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+               Text="Licensed under the GNU General Public License v3.0" />
+    <TextBlock Name="Credit" Classes="description" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" TextWrapping="Wrap"
+               TextAlignment="Center" Text="Inspired by Fork. Not affiliated with Fork or its developers." />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16" Margin="0,8,0,0">
+      <Button Name="GitHubLink" Classes="link" Content="GitHub Page" Tag="{x:Static vm:AboutViewModel.RepositoryUrl}" Click="OnLinkClick" />
+      <Button Name="LicenseLink" Classes="link" Content="License" Tag="{x:Static vm:AboutViewModel.LicenseUrl}" Click="OnLinkClick" />
+      <Button Name="NoticesLink" Classes="link" Content="Third-Party Notices" Tag="{x:Static vm:AboutViewModel.NoticesUrl}" Click="OnLinkClick" />
+    </StackPanel>
+    <SelectableTextBlock Name="RuntimeText" FontSize="11" HorizontalAlignment="Center" Margin="0,8,0,0"
+                         Foreground="{DynamicResource Color.Text.Muted}" Text="{Binding RuntimeInfo}" />
+  </StackPanel>
+</UserControl>

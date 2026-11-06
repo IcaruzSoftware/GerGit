@@ -1,0 +1,142 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.ConflictCard"
+             x:DataType="vm:ConflictCardViewModel"
+             Background="{DynamicResource Color.Editor.Bg}">
+  <!-- Conflict card, unresolved state. The bracket between checked cards is a 2 px accent line at the cards' top. -->
+  <UserControl.Styles>
+    <Style Selector="ToggleButton.side">
+      <Setter Property="MinWidth" Value="150" />
+      <Setter Property="Padding" Value="15,10,15,12" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Top" />
+      <Setter Property="Background" Value="{DynamicResource Color.Mergecheck.Bg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Mergecheck.Border}" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+    </Style>
+    <Style Selector="ToggleButton.side /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Color.Mergecheck.Bg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Mergecheck.Border}" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+    </Style>
+    <!-- The theme's checked/pressed accent fill is not used: the check box shows the state. -->
+    <Style Selector="ToggleButton.side:checked /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.side:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Color.Mergecheck.BgPressed}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Mergecheck.Border}" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+    </Style>
+    <Style Selector="ToggleButton.side:pointerover /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.side:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Color.Mergecheck.BgHover}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Mergecheck.BorderHover}" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Primary}" />
+    </Style>
+    <Style Selector="Border.chip">
+      <Setter Property="Background" Value="{DynamicResource Color.Ref.DetailBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Ref.DetailBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="Margin" Value="0,6,0,0" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="Button.sha">
+      <Setter Property="Width" Value="42" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource Color.Text.Muted}" />
+      <Setter Property="Focusable" Value="False" />
+    </Style>
+    <Style Selector="Border.bracket">
+      <Setter Property="Height" Value="2" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Margin" Value="0,12,0,0" />
+      <Setter Property="Background" Value="{DynamicResource Color.Accent.Base}" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.DataTemplates>
+    <DataTemplate DataType="vm:ConflictSide">
+      <StackPanel>
+        <DockPanel>
+          <CheckBox DockPanel.Dock="{Binding CheckDock}" Width="16" MinWidth="16" Height="16" MinHeight="16" Padding="0"
+                    Focusable="False" IsHitTestVisible="False" VerticalAlignment="Top"
+                    IsChecked="{Binding $parent[ToggleButton].IsChecked}" />
+          <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+            <c:LucideIcon Icon="{Binding Icon}" Size="12" VerticalAlignment="Center" Foreground="{DynamicResource Color.Icon.Default}" />
+            <TextBlock Text="{Binding Word}" FontSize="13" VerticalAlignment="Center" />
+          </StackPanel>
+        </DockPanel>
+        <Border Classes="chip">
+          <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+        </Border>
+        <Border Height="1" Margin="0,8,0,4" Background="{DynamicResource Color.Border.Default}" IsVisible="{Binding HasCommits}" />
+        <ScrollViewer MaxHeight="156" IsVisible="{Binding HasCommits}" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Commits}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:ConflictCommitRow">
+                <Grid Height="20" ColumnDefinitions="Auto,Auto,*,Auto" ToolTip.Tip="{Binding ToolTip}">
+                  <c:AvatarView VerticalAlignment="Center" AuthorName="{Binding AuthorName}" Email="{Binding AuthorEmail}" />
+                  <Button Grid.Column="1" Classes="sha" Content="{Binding ShortSha}" Margin="4,0"
+                          Command="{Binding $parent[UserControl].((vm:ConflictCardViewModel)DataContext).OpenCommitCommand}"
+                          CommandParameter="{Binding Sha}" />
+                  <TextBlock Grid.Column="2" Text="{Binding Subject}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="3" Text="{Binding Date}" FontSize="12" Margin="6,0,0,0" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Color.Text.Secondary}" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="0,30">
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+        <c:LucideIcon Icon="triangle-alert" Size="20" VerticalAlignment="Center" Foreground="{DynamicResource Color.Status.Warning}" />
+        <TextBlock Text="Merge conflict" FontSize="16" FontWeight="Medium" VerticalAlignment="Center" />
+      </StackPanel>
+      <TextBlock Text="Select the changes or merge them manually" FontSize="14" HorizontalAlignment="Center" Margin="0,4,0,0"
+                 Foreground="{DynamicResource Color.Text.Secondary}" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="30,8,30,0">
+        <c:LucideIcon Icon="file" Size="20" VerticalAlignment="Center" Foreground="{DynamicResource Color.Icon.Default}" />
+        <TextBlock Name="CardPath" Text="{Binding Path}" FontSize="15" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                   ToolTip.Tip="{Binding Path}" />
+      </StackPanel>
+
+      <Grid Margin="0,20,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" MinWidth="160" />
+          <ColumnDefinition Width="50" />
+          <ColumnDefinition Width="50" />
+          <ColumnDefinition Width="*" MinWidth="160" />
+        </Grid.ColumnDefinitions>
+        <ToggleButton Name="TheirsCard" Classes="side" Margin="30,0,0,0" IsChecked="{Binding TheirsChecked}" Content="{Binding Theirs}" />
+        <Border Grid.Column="1" Classes="bracket" IsVisible="{Binding TheirsChecked}" />
+        <Border Grid.Column="2" Classes="bracket" IsVisible="{Binding OursChecked}" />
+        <ToggleButton Name="OursCard" Grid.Column="3" Classes="side" Margin="0,0,30,0" IsChecked="{Binding OursChecked}" Content="{Binding Ours}" />
+      </Grid>
+
+      <Button Name="PrimaryButton" HorizontalAlignment="Center" Margin="0,20,0,0" Padding="16,3"
+              Content="{Binding PrimaryText}" IsEnabled="{Binding PrimaryEnabled}" Command="{Binding PrimaryCommand}" />
+      <!-- External merge: `Merge in <Tool>` (primary tool) and the drop-down arrow with every tool. -->
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0" Spacing="1" IsVisible="{Binding ShowMergeTool}">
+        <Button Name="MergeToolButton" Padding="16,3" Content="{Binding MergeToolText}" Command="{Binding MergeInToolCommand}" />
+        <Button Name="MergeToolArrow" Padding="4,3" VerticalAlignment="Stretch" IsVisible="{Binding ShowMergeToolArrow}"
+                Click="OnMergeToolArrow">
+          <c:LucideIcon Icon="chevron-down" Size="12" />
+        </Button>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.CheckoutView"
+             x:DataType="vm:CheckoutViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <!-- Checkout Branch, Checkout and Fast-Forward, Checkout Commit. -->
+  <StackPanel Grid.IsSharedSizeScope="True" Spacing="4">
+    <ItemsControl Name="Rows" ItemsSource="{Binding Rows}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:LabeledPoint">
+          <Grid Margin="0,0,0,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" SharedSizeGroup="L" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+            <TextBlock Classes="label" Text="{Binding Label}" />
+            <c:RefView Grid.Column="1" Margin="8,0,0,0" Icon="{Binding Point.Icon}" Text="{Binding Point.Text}" Detail="{Binding Point.Detail}" />
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <Grid>
+      <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" SharedSizeGroup="L" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+      <TextBlock Classes="label" Text="Local changes:" IsVisible="{Binding Local.IsVisible}" />
+      <r:LocalChangesBlockView Name="LocalBlock" Grid.Column="1" Margin="8,0,0,0" DataContext="{Binding Local}" />
+    </Grid>
+  </StackPanel>
+</UserControl>

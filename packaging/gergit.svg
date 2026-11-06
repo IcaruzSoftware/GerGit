@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24">
+  <!-- GerGit application icon: a "G" drawn as a git branch (in the style of the Lucide "git-branch" icon, https://lucide.dev),
+       white on a British racing green rounded square.
+       src/GerGit/Assets/gergit.png (window icon, 256 px) is rendered from this file.
+       Lucide is ISC-licensed; the full licence text is in src/GerGit/Assets/LUCIDE-LICENSE.txt.
+       The comment sits inside <svg>: gdk-pixbuf (GNOME) only detects SVG when "<svg" appears near the start of the file. -->
+  <rect width="24" height="24" rx="5" fill="#004225"/>
+  <g fill="#004225" stroke="#FFFFFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16.95 7.05A7 7 0 1 0 19 12H12" fill="none"/>
+    <circle cx="16.95" cy="7.05" r="2.25"/>
+    <circle cx="12" cy="12" r="2.25"/>
+  </g>
+</svg>

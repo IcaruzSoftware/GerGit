@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.ActivityPopup"
+             x:DataType="vm:ActivityViewModel">
+  <UserControl.Styles>
+    <Style Selector="TabStrip.details > TabStripItem">
+      <Setter Property="MinHeight" Value="27" />
+      <Setter Property="Height" Value="27" />
+    </Style>
+  </UserControl.Styles>
+  <!-- Activity Manager popup: 1024 x 440, job list left (320 px), selected job right. -->
+  <Border Width="1024" Height="440" Margin="10,5,10,10" BorderThickness="1" CornerRadius="6" ClipToBounds="True"
+          BorderBrush="{DynamicResource Color.Border.Default}" Background="{DynamicResource Color.Editor.Bg}"
+          BoxShadow="0 2 10 0 #66808080">
+    <Grid ColumnDefinitions="320,*" RowDefinitions="28,*">
+      <Border Grid.RowSpan="2" Background="{DynamicResource Color.List.Bg}" />
+      <TabStrip Name="Filter" Classes="details" HorizontalAlignment="Center" SelectedIndex="{Binding FilterIndex}">
+        <TabStripItem Content="All" />
+        <TabStripItem Content="User" />
+        <TabStripItem Content="Background" />
+      </TabStrip>
+      <ListBox Name="JobList" Grid.Row="1" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected}"
+               Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="4,2,4,0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Default}" />
+          </Style>
+          <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Color.Row.BgSelected}" />
+            <Setter Property="Foreground" Value="White" />
+          </Style>
+        </ListBox.Styles>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:JobRowViewModel">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="16,16,2">
+              <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3" IsVisible="{Binding FinishTime, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <c:LucideIcon Icon="triangle-alert" Size="14" IsVisible="{Binding ShowWarning}" Foreground="{DynamicResource Color.Status.Warning}" />
+                <TextBlock Text="{Binding FinishTime}" FontSize="12" Opacity="0.7" />
+              </StackPanel>
+              <TextBlock Grid.Row="1" Text="{Binding Message}" FontSize="12" Opacity="0.8" TextTrimming="CharacterEllipsis" />
+              <StackPanel Grid.Column="1" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center" IsVisible="{Binding IsRunning}">
+                <c:BusySpinner Width="14" Height="14" Foreground="{DynamicResource Color.Spinner.Color}" />
+                <Button Classes="icon" Width="16" Height="16" Margin="4,0,0,0" IsVisible="{Binding CanCancel}"
+                        Command="{Binding CancelCommand}" ToolTip.Tip="Cancel">
+                  <c:LucideIcon Icon="x" Size="12" />
+                </Button>
+              </StackPanel>
+              <ProgressBar Grid.Row="2" Grid.ColumnSpan="2" Height="2" MinHeight="2" Minimum="0" Maximum="100"
+                           Value="{Binding ProgressValue}" IsVisible="{Binding HasProgress}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <TextBlock Grid.Row="1" Classes="empty-title" VerticalAlignment="Center" Text="No Activities" IsVisible="{Binding IsEmpty}" />
+
+      <DockPanel Grid.Column="1" IsVisible="{Binding HasSelection}">
+        <TextBlock Name="StateText" DockPanel.Dock="Right" Margin="0,6,10,0" Opacity="0.7" Text="{Binding StateText}" />
+        <TextBlock Name="JobName" Margin="10,4" FontSize="14" FontWeight="Medium" Opacity="0.7"
+                   TextTrimming="CharacterEllipsis" Text="{Binding Selected.Name, FallbackValue=''}" />
+      </DockPanel>
+      <c:OutputView Name="Output" Grid.Row="1" Grid.Column="1" Margin="10,5,2,2" Text="{Binding Output}" IsVisible="{Binding HasSelection}" />
+      <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Spacing="10" IsVisible="{Binding !HasSelection}">
+        <c:LucideIcon Icon="list-checks" Size="64" HorizontalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+        <TextBlock Classes="empty-title" Text="No Selected Activity" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

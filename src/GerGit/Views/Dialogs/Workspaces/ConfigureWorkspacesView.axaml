@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.ConfigureWorkspacesView"
+             x:DataType="vm:ConfigureWorkspacesViewModel">
+  <!-- Configure Workspaces. -->
+  <DockPanel>
+    <CheckBox Name="ShowInTitleBox" DockPanel.Dock="Bottom" Margin="0,8,0,0" Content="Show workspace name in title bar"
+              IsChecked="{Binding ShowInTitle}" />
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="2" Margin="0,4,0,0">
+      <Button Name="AddButton" Classes="icon" Width="20" Height="20" ToolTip.Tip="Add New Workspace" Click="OnAddClick">
+        <c:LucideIcon Icon="plus" Size="12" />
+      </Button>
+      <Button Name="RemoveButton" Classes="icon" Width="20" Height="20" IsEnabled="{Binding CanRemove}" Click="OnRemoveClick">
+        <c:LucideIcon Icon="minus" Size="12" />
+      </Button>
+    </StackPanel>
+    <ListBox Name="List" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}" MinHeight="120"
+             BorderThickness="1" BorderBrush="{DynamicResource Color.List.Border}" Background="{DynamicResource Color.List.Bg}"
+             KeyDown="OnListKeyDown">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:WorkspaceItem">
+          <Panel Height="20" Background="Transparent">
+            <Panel.ContextMenu>
+              <ContextMenu>
+                <MenuItem Header="Add New Workspace" Click="OnAddClick" />
+                <Separator />
+                <MenuItem Header="Rename" InputGesture="F2" Click="OnRenameClick" />
+                <MenuItem Header="Delete..." Click="OnRemoveRowClick"
+                          IsEnabled="{Binding $parent[ListBox].((vm:ConfigureWorkspacesViewModel)DataContext).CanRemove}" />
+              </ContextMenu>
+            </Panel.ContextMenu>
+            <TextBlock Text="{Binding Name}" FontSize="13" VerticalAlignment="Center" IsVisible="{Binding !IsEditing}" />
+            <TextBox Text="{Binding EditText}" IsVisible="{Binding IsEditing}" MinHeight="0" Padding="2,0" FontSize="13"
+                     KeyDown="OnRenameKeyDown" LostFocus="OnRenameLostFocus" PropertyChanged="OnRenameBoxPropertyChanged" />
+          </Panel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</UserControl>

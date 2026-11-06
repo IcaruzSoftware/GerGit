@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.SaveStashView"
+             x:DataType="vm:SaveStashViewModel">
+  <!-- Save Stash / "Save Snapshot". -->
+  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+    <TextBlock FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" Text="Message:" />
+    <TextBox Name="MessageBox" Grid.Column="1" Text="{Binding Message}" PlaceholderText="Stash message (optional)">
+      <TextBox.InnerLeftContent><c:LucideIcon Icon="archive" Size="14" Margin="6,0,0,0" VerticalAlignment="Center" /></TextBox.InnerLeftContent>
+    </TextBox>
+    <CheckBox Name="StageNewFilesBox" Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Content="Stage new files" IsChecked="{Binding StageNewFiles}" />
+    <TextBlock Grid.Row="2" Grid.Column="1" FontSize="12" Margin="28,2,0,0" Foreground="{DynamicResource Color.Text.Link}" Text="By default stash ignores new files until you stage them" />
+  </Grid>
+</UserControl>

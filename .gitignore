@@ -1,0 +1,17 @@
+bin/
+obj/
+*.user
+artifacts/
+# Debian packaging: vendored NuGet packages (orig-nuget component) and build output
+/nuget/
+/debian/build/
+/debian/.debhelper/
+/debian/gergit/
+/debian/files
+/debian/*.substvars
+/debian/debhelper-build-stamp
+TestResults/
+.vs/
+.idea/
+.vscode/
+*.nupkg

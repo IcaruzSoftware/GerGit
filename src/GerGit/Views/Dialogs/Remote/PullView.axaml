@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:core="using:GerGit.Core"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.PullView"
+             x:DataType="vm:PullViewModel"
+             c:RefView.HostOf="{Binding HostOf}">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+  </UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Remote:" />
+    <ComboBox Name="Remote" Grid.Column="1" ItemsSource="{Binding Remotes}" SelectedItem="{Binding SelectedRemote}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="x:String"><c:RefView Remote="{Binding}" Text="{Binding}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock Classes="label" Grid.Row="1" Text="Branch:" />
+    <ComboBox Name="Branch" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Branches}" SelectedItem="{Binding SelectedBranch}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="core:GitRef"><c:RefView Icon="git-branch" Text="{Binding ShortName}" /></DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock Classes="label" Grid.Row="2" Text="Into:" />
+    <c:RefView Name="Into" Grid.Row="2" Grid.Column="1" Icon="git-branch" Text="{Binding Into}" Height="24" />
+    <CheckBox Name="Rebase" Grid.Row="3" Grid.Column="1" Content="Rebase instead of merge" ToolTip.Tip="--rebase"
+              IsChecked="{Binding Rebase}" />
+    <CheckBox Name="AutoStash" Grid.Row="4" Grid.Column="1" Content="Stash and reapply local changes"
+              IsChecked="{Binding AutoStash}" />
+  </Grid>
+</UserControl>

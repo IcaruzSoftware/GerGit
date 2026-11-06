@@ -1,0 +1,2 @@
+# Skia inside SkiaSharp's prebuilt native library (NuGet package) links these statically.
+embedded-library * [usr/lib/gergit/libSkiaSharp.so]

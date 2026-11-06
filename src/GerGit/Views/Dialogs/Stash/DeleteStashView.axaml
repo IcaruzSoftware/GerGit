@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs"
+             xmlns:c="using:GerGit.Controls"
+             xmlns:core="using:GerGit.Core"
+             x:Class="GerGit.Views.Dialogs.DeleteStashView"
+             x:DataType="vm:DeleteStashViewModel">
+  <!-- Delete Stash(es): one row, or a bordered 80 px list. -->
+  <Grid ColumnDefinitions="Auto,*">
+    <TextBlock FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,8,0" Text="{Binding Label}" />
+    <c:RefView Grid.Column="1" Icon="archive" Text="{Binding Stashes[0].Name}" Detail="{Binding Stashes[0].ShortSubject}"
+               IsVisible="{Binding !IsMultiple}" />
+    <Border Grid.Column="1" Height="80" BorderThickness="1" BorderBrush="{DynamicResource Color.Border.Default}"
+            Background="{DynamicResource Color.List.Bg}" IsVisible="{Binding IsMultiple}">
+      <ScrollViewer>
+        <ItemsControl Name="StashList" ItemsSource="{Binding Stashes}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="core:StashEntry">
+              <c:RefView Margin="6,2" Icon="archive" Text="{Binding Name}" Detail="{Binding ShortSubject}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</UserControl>

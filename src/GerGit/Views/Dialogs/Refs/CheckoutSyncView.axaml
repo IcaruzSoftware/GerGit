@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.CheckoutSyncView"
+             x:DataType="vm:CheckoutSyncViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+    <TextBlock Classes="label" Text="Branch:" />
+    <c:RefView Name="Local" Grid.Column="1" Icon="{Binding Local.Icon}" Text="{Binding Local.Text}" />
+    <TextBlock Grid.Row="1" Classes="label" Text="Action:" />
+    <ComboBox Name="ActionBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" SelectedIndex="{Binding SelectedIndex}">
+      <ComboBoxItem>
+        <StackPanel Orientation="Horizontal" Spacing="6" Width="420">
+          <Ellipse Classes="dot" Fill="{DynamicResource Color.Signal.Green}" />
+          <TextBlock Width="70" Text="Checkout" />
+          <TextBlock Classes="description" TextTrimming="CharacterEllipsis" Text="{Binding CheckoutText}" />
+        </StackPanel>
+      </ComboBoxItem>
+      <ComboBoxItem IsEnabled="False"><Separator /></ComboBoxItem>
+      <ComboBoxItem>
+        <StackPanel Orientation="Horizontal" Spacing="6" Width="420">
+          <Ellipse Classes="dot" Fill="{DynamicResource Color.Signal.Yellow}" />
+          <TextBlock Width="70" Text="Rebase" />
+          <TextBlock Classes="description" TextTrimming="CharacterEllipsis" Text="{Binding RebaseText}" />
+        </StackPanel>
+      </ComboBoxItem>
+      <ComboBoxItem>
+        <StackPanel Orientation="Horizontal" Spacing="6" Width="420">
+          <Ellipse Classes="dot" Fill="{DynamicResource Color.Signal.Yellow}" />
+          <TextBlock Width="70" Text="Merge" />
+          <TextBlock Classes="description" TextTrimming="CharacterEllipsis" Text="{Binding MergeText}" />
+        </StackPanel>
+      </ComboBoxItem>
+      <ComboBoxItem IsEnabled="False"><Separator /></ComboBoxItem>
+      <ComboBoxItem>
+        <StackPanel Orientation="Horizontal" Spacing="6" Width="420">
+          <Ellipse Classes="dot" Fill="{DynamicResource Color.Signal.Red}" />
+          <TextBlock Width="70" Text="Reset" />
+          <TextBlock Classes="description" TextTrimming="CharacterEllipsis" Text="{Binding ResetText}" />
+        </StackPanel>
+      </ComboBoxItem>
+    </ComboBox>
+    <CheckBox Name="StashBox" Grid.Row="2" Grid.Column="1" Content="Stash and reapply local changes" IsChecked="{Binding Stash}" />
+  </Grid>
+</UserControl>

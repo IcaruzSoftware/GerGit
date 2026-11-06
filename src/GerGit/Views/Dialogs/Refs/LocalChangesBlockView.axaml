@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Refs"
+             xmlns:r="using:GerGit.Views.Dialogs.Refs"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Refs.LocalChangesBlockView"
+             x:DataType="vm:LocalChangesBlockViewModel">
+  <UserControl.Styles><StyleInclude Source="avares://GerGit/Views/Dialogs/Refs/RefStyles.axaml" /></UserControl.Styles>
+  <!-- Local-changes block; the host shows the "Local changes:" label next to it. -->
+  <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsVisible}">
+    <RadioButton Name="DontChange" FontSize="13" Content="Don't change" IsChecked="{Binding IsDontChange}"
+                 ToolTip.Tip="Stop if some local changes would be overwritten by checkout" />
+    <RadioButton Name="Stash" FontSize="13" Content="{Binding StashLabel}" IsChecked="{Binding IsStash}"
+                 ToolTip.Tip="Hold Shift to not reapply" />
+    <c:LucideIcon Name="DiscardWarning" Classes="warning" IsVisible="{Binding IsDiscard}" />
+    <RadioButton Name="Discard" FontSize="13" Content="Discard" IsChecked="{Binding IsDiscard}"
+                 ToolTip.Tip="Discard local changes (--force)" />
+  </StackPanel>
+</UserControl>

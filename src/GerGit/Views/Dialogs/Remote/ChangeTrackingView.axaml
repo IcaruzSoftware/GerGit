@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels.Dialogs.Remote"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.Dialogs.Remote.ChangeTrackingView"
+             x:DataType="vm:ChangeTrackingViewModel">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://GerGit/Views/Dialogs/Remote/RemoteForm.axaml" />
+    <Style Selector="ComboBox#Track ComboBoxItem" x:DataType="vm:TrackItem">
+      <Setter Property="IsEnabled" Value="{Binding IsSelectable}" />
+    </Style>
+  </UserControl.Styles>
+  <Grid Classes="form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+    <TextBlock Classes="label" Text="Branch:" />
+    <c:RefView Name="Branch" Grid.Column="1" Icon="git-branch" Text="{Binding Branch}" Height="24" />
+    <TextBlock Classes="label" Grid.Row="1" Text="Track:" />
+    <ComboBox Name="Track" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:TrackItem">
+          <Panel>
+            <Separator IsVisible="{Binding IsSeparator}" Margin="0" />
+            <c:RefView Icon="{Binding Icon}" Text="{Binding Text}" IsVisible="{Binding IsSelectable}" />
+          </Panel>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+  </Grid>
+</UserControl>

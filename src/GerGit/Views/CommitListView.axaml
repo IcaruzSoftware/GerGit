@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GerGit.ViewModels"
+             xmlns:c="using:GerGit.Controls"
+             x:Class="GerGit.Views.CommitListView"
+             x:DataType="vm:CommitListViewModel"
+             Background="{DynamicResource Color.List.Bg}">
+  <!-- A custom-drawn list (only visible rows are rendered) and its scroll bar. No status bar yet:
+       it only shows for reflog mode and branch filters, which come later. -->
+  <DockPanel>
+    <!-- Search bar: 30 px, slides down in 300 ms (ease-out quadratic) and pushes the list down. -->
+    <Border x:Name="SearchBar" DockPanel.Dock="Top" Height="0" ClipToBounds="True" Background="{DynamicResource Color.Toolbar.Bg}">
+      <Border.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Height" Duration="0:0:0.3" Easing="QuadraticEaseOut" />
+        </Transitions>
+      </Border.Transitions>
+      <DockPanel Height="22" Margin="6,4,4,4" VerticalAlignment="Bottom" IsEnabled="{Binding IsSearchOpen}">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="2" Margin="4,0,0,0" VerticalAlignment="Center">
+          <Button x:Name="PreviousButton" Classes="icon" Width="20" Height="20" Command="{Binding PreviousMatchCommand}">
+            <c:LucideIcon Icon="chevron-up" Size="16" />
+          </Button>
+          <Button x:Name="NextButton" Classes="icon" Width="20" Height="20" Command="{Binding NextMatchCommand}">
+            <c:LucideIcon Icon="chevron-down" Size="16" />
+          </Button>
+          <Button x:Name="CloseButton" Classes="icon" Width="20" Height="20" Command="{Binding CloseSearchCommand}">
+            <c:LucideIcon Icon="x" Size="16" />
+          </Button>
+        </StackPanel>
+        <TextBox x:Name="SearchBox" Classes="filter" PlaceholderText="Search SHA, branch, author or message"
+                 Text="{Binding SearchInput}">
+          <TextBox.InnerLeftContent>
+            <c:LucideIcon Icon="search" Size="14" Margin="4,0,2,0" VerticalAlignment="Center" Foreground="{DynamicResource Color.Glyph.Default}" />
+          </TextBox.InnerLeftContent>
+          <TextBox.InnerRightContent>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0" Spacing="4">
+              <c:BusySpinner Width="12" Height="12" Foreground="{DynamicResource Color.Text.Muted}" IsVisible="{Binding IsSearching}" />
+              <TextBlock x:Name="MatchCount" Text="{Binding MatchCountText}" VerticalAlignment="Center" Foreground="{DynamicResource Color.Text.Muted}" />
+            </StackPanel>
+          </TextBox.InnerRightContent>
+        </TextBox>
+      </DockPanel>
+    </Border>
+    <Grid ColumnDefinitions="*,Auto">
+      <c:CommitListPanel x:Name="List" />
+      <ScrollBar x:Name="Bar" Grid.Column="1" Orientation="Vertical" />
+    </Grid>
+  </DockPanel>
+</UserControl>
