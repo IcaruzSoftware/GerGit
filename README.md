@@ -98,6 +98,8 @@ dotnet test
 - [Architecture](docs/architecture.md)
 - [Third-party notices](THIRD-PARTY-NOTICES.md)
 
+<a href="https://alternativeto.net/software/gergit/about/?utm_source=badge&amp;utm_medium=referral"><img src="https://alternativeto.net/static/badges/badge-compact-color.svg" alt="GerGit on AlternativeTo" width="160"></a>
+
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
