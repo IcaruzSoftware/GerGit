@@ -59,14 +59,6 @@ sudo add-apt-repository ppa:icaruzsoftware/gergit
 sudo apt install gergit
 ```
 
-### Arch Linux (AUR)
-
-```bash
-yay -S gergit-bin
-```
-
-Or any other AUR helper.
-
 ### Other distributions (tarball)
 
 Any x64 Linux with glibc and git 2.38 or newer: download `gergit-<version>-linux-x64.tar.gz` from the [latest release](https://github.com/IcaruzSoftware/GerGit/releases/latest), then
