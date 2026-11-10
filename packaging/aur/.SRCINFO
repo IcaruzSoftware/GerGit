@@ -35,6 +35,6 @@ pkgbase = gergit-bin
 	options = !strip
 	options = !debug
 	source = https://github.com/IcaruzSoftware/GerGit/releases/download/v1.0.2/gergit-1.0.2-linux-x64.tar.gz
-	sha256sums = SKIP
+	sha256sums = 24cc9306c24b1e53078b76d4b69869b743135e1266563210f8a66ba7e810fe57
 
 pkgname = gergit-bin

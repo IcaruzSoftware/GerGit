@@ -16,8 +16,7 @@ conflicts=(gergit)
 # Stripping breaks the .NET single-file bundle.
 options=(!strip !debug)
 source=("https://github.com/IcaruzSoftware/GerGit/releases/download/v$pkgver/gergit-$pkgver-linux-x64.tar.gz")
-# Replace with the published asset's checksum (updpkgsums) before pushing to the AUR.
-sha256sums=('SKIP')
+sha256sums=('24cc9306c24b1e53078b76d4b69869b743135e1266563210f8a66ba7e810fe57')
 
 package() {
   cd "gergit-$pkgver-linux-x64"
