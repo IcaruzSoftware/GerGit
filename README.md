@@ -11,7 +11,7 @@
   <a href="https://launchpad.net/~icaruzsoftware/+archive/ubuntu/gergit"><img src="https://img.shields.io/badge/Ubuntu-PPA-E95420?logo=ubuntu&amp;logoColor=white" alt="Ubuntu PPA"></a>
 </p>
 
-Inspired by [Fork](https://git-fork.com/). Not affiliated with Fork or its developers.
+Inspired by [Git Fork](https://git-fork.com/). Not affiliated with Git Fork or its developers.
 
 ![GerGit](docs/screenshot.png)
 
@@ -59,6 +59,25 @@ sudo add-apt-repository ppa:icaruzsoftware/gergit
 sudo apt install gergit
 ```
 
+### Arch Linux (AUR)
+
+```bash
+yay -S gergit-bin
+```
+
+Or any other AUR helper.
+
+### Other distributions (tarball)
+
+Any x64 Linux with glibc and git 2.38 or newer: download `gergit-<version>-linux-x64.tar.gz` from the [latest release](https://github.com/IcaruzSoftware/GerGit/releases/latest), then
+
+```bash
+tar xf gergit-<version>-linux-x64.tar.gz
+./gergit-<version>-linux-x64/GerGit
+```
+
+It also needs ICU, OpenSSL, fontconfig and the X11 libraries, which desktop installs normally have. The folder also has the desktop file and icons.
+
 ### Build from source
 
 Needs the .NET 10 SDK and git 2.38 or newer.
@@ -87,7 +106,7 @@ dotnet test
 
 ## Local package build
 
-`packaging/build-deb.sh` builds a `.deb` into `artifacts/` for testing. It needs the .NET 10 SDK and `dpkg-dev`. To install GerGit, use the [PPA](#ubuntu-ppa); releases to the PPA are described in [packaging/PPA.md](packaging/PPA.md).
+`packaging/build-deb.sh` builds a `.deb` into `artifacts/` for testing. It needs the .NET 10 SDK and `dpkg-dev`. To install GerGit, use the [PPA](#ubuntu-ppa); releases to the PPA are described in [packaging/PPA.md](packaging/PPA.md), the tarball and AUR package in [packaging/AUR.md](packaging/AUR.md).
 
 ## Project
 

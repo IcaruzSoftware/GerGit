@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build and attach the tarball to (for example v1.0.2)
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+  AVALONIA_TELEMETRY_OPTOUT: 1
+  TAG: ${{ inputs.tag || github.event.release.tag_name }}
+
+jobs:
+  tarball:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          persist-credentials: false
+      # Older tags predate build-tarball.sh: take it from the commit this workflow runs from.
+      - name: Use current build script
+        run: |
+          git fetch --depth=1 origin "$GITHUB_SHA"
+          git checkout "$GITHUB_SHA" -- packaging/build-tarball.sh
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Check version matches tag
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/GerGit/GerGit.csproj)
+          [[ $version == "${TAG#v}" ]] || { echo "::error::csproj <Version> $version does not match tag $TAG"; exit 1; }
+      - name: Build tarball
+        run: |
+          tarball=$(packaging/build-tarball.sh)
+          echo "TARBALL=$tarball" >> "$GITHUB_ENV"
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG" "$TARBALL" "$TARBALL.sha256" --clobber
