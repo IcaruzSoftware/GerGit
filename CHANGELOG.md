@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] - 2026-11-11
+
+### Fixed
+
+- Context menus were sometimes cut off on both sides (with the window narrower than the menu). Context menus are no longer narrowed to fit a screen, and at 100 % zoom a menu that still comes out too narrow keeps its left edge, so the beginning of every entry stays readable.
+
 ## [1.0.2] - 2026-11-06
 
 ### Added

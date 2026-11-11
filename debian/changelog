@@ -1,3 +1,10 @@
+gergit (1.0.3-1~ppa1) resolute; urgency=medium
+
+  * New upstream release 1.0.3: context menus are no longer cut off on
+    both sides.
+
+ -- Gerrit Visser <developericaruz@gmail.com>  Wed, 11 Nov 2026 10:02:15 +0100
+
 gergit (1.0.2-1~ppa1) resolute; urgency=medium
 
   * New upstream release 1.0.2: Help menu with About dialog, security
