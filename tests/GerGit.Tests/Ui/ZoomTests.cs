@@ -110,6 +110,25 @@ public sealed class ZoomTests : IDisposable
     }
 
     [AvaloniaFact]
+    public void At_100_percent_popups_take_no_transform_so_a_too_narrow_menu_keeps_its_left_edge()
+    {
+        var button = new Button { Content = "Target", Width = 100, Height = 30 };
+        var w = Track(new Window { Width = 400, Height = 300, Content = button });
+        w.Show();
+        Settle(w);
+        var menu = MenuControls.Open(button, [Menus.Item("First", null)]);
+        Settle(w);
+        Assert.False(((Popup)menu.Parent!).InheritsTransform);
+        menu.Close();
+
+        Zoom.Set(150);
+        menu = MenuControls.Open(button, [Menus.Item("First", null)]);
+        Settle(w);
+        Assert.True(((Popup)menu.Parent!).InheritsTransform);
+        menu.Close();
+    }
+
+    [AvaloniaFact]
     public void Context_menus_popups_and_tooltips_take_the_scale_of_their_window()
     {
         Zoom.Set(150);

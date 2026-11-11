@@ -31,9 +31,10 @@
 
   <!-- Context menus, tooltips, flyouts, combo box drop-downs, submenus and GerGit's own popups take the scale of
        their target, so they match the window they open from (and follow a zoom change while open). :is also covers
-       Popup subclasses (AvaloniaEdit's completion popups).
+       Popup subclasses (AvaloniaEdit's completion popups). Off at 100 % (see Zoom.PopupsScaleKey);
+       a popup already open when the zoom leaves 100 % gets the scale when it opens again.
        Limitation: popup offsets (HorizontalOffset / VerticalOffset) are not scaled. -->
   <Style Selector=":is(Popup)">
-    <Setter Property="InheritsTransform" Value="True" />
+    <Setter Property="InheritsTransform" Value="{DynamicResource Zoom.PopupsScale}" />
   </Style>
 </Styles>

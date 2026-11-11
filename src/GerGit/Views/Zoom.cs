@@ -25,6 +25,11 @@ public static class Zoom
 {
     public const string TransformKey = "Zoom.Transform";
 
+    /// <summary>Whether popups take their target's scale (<c>Themes/Zoom.axaml</c>): only when zoomed. At 100 % the
+    /// transform would do nothing but center a popup's content in its window, so a menu whose window came out too narrow
+    /// would lose its left side instead of only its right.</summary>
+    public const string PopupsScaleKey = "Zoom.PopupsScale";
+
     /// <summary>The open windows with their design (100 %) size and minimum size.</summary>
     static readonly Dictionary<Window, (Size Size, Size Min)> s_open = [];
 
@@ -47,6 +52,7 @@ public static class Zoom
         Scale = 1;
         s_open.Clear();
         app.Resources[TransformKey] = new ScaleTransform(1, 1);
+        app.Resources[PopupsScaleKey] = false;
         if (s_hooked) return;
         s_hooked = true;
         PercentProperty.Changed.AddClassHandler<Window>((_, e) => Set((int)e.NewValue!));
@@ -65,6 +71,7 @@ public static class Zoom
         if (scale == Scale) return;
         Scale = scale;
         Application.Current!.Resources[TransformKey] = new ScaleTransform(scale, scale);
+        Application.Current.Resources[PopupsScaleKey] = scale != 1;
         foreach (var (w, design) in s_open)
         {
             var area = Area(w.Screens?.ScreenFromWindow(w) ?? w.Screens?.Primary);
