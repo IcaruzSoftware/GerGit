@@ -233,6 +233,11 @@
     <Setter Property="CornerRadius" Value="6" />
     <Setter Property="Padding" Value="2" />
   </Style>
+  <!-- No ResizeX: Avalonia 12.1 narrows a popup that does not fit its screen (with wrong math for screens not at x=0),
+       and the narrowed menu is then cut off on both sides. Flip and slide still keep it on screen. -->
+  <Style Selector="ContextMenu">
+    <Setter Property="PlacementConstraintAdjustment" Value="FlipX, FlipY, SlideX, SlideY, ResizeY" />
+  </Style>
 
   <!-- repository tab strip -->
   <Style Selector="ListBox.tabs">

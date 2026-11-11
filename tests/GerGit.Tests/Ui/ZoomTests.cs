@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -123,6 +124,9 @@ public sealed class ZoomTests : IDisposable
         var menuRoot = Root(menu);
         Assert.NotSame(w, menuRoot);
         Assert.Equal(1.5, DrawnScale(menu), 3);
+        // Never narrowed to fit a screen (the scaled content would be cut off on both sides).
+        Assert.False(menu.PlacementConstraintAdjustment.HasFlag(PopupPositionerConstraintAdjustment.ResizeX));
+        Assert.True(menu.PlacementConstraintAdjustment.HasFlag(PopupPositionerConstraintAdjustment.SlideX));
         // A submenu opens from inside the scaled menu: scaled once, not twice.
         var more = menu.Items.OfType<MenuItem>().Last();
         more.IsSubMenuOpen = true;
